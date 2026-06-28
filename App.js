@@ -119,6 +119,7 @@ export default function App() {
   const featureScales = useRef(FEATURES.map(() => new Animated.Value(1))).current;
   const videoContainerRef = useRef(null);
   const videoProgress = useRef(new Animated.Value(0)).current;
+  const btnFlip = useRef(new Animated.Value(1)).current;
 
   const [menuOpen, setMenuOpen]       = useState(false);
   const [formOpen, setFormOpen]       = useState(false);
@@ -128,6 +129,7 @@ export default function App() {
   const [message, setMessage]         = useState('');
   const [activeFeature, setActiveFeature] = useState(null);
   const [videoPlaying, setVideoPlaying]   = useState(false);
+  const [btnIndex, setBtnIndex]           = useState(0);
 
   const videoW = isDesktop ? Math.min(width - 120, 960) : width - 56;
   const videoH = Math.round(videoW * 9 / 16);
@@ -150,6 +152,20 @@ export default function App() {
       observer.observe(node);
     }, 800);
     return () => clearTimeout(timer);
+  }, []);
+
+  const BTN_LABELS = ['Schedule Sessions 24/7', 'Download Our App'];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Collapse
+      Animated.timing(btnFlip, { toValue: 0, duration: 180, useNativeDriver: true }).start(() => {
+        setBtnIndex(i => (i + 1) % BTN_LABELS.length);
+        // Expand
+        Animated.timing(btnFlip, { toValue: 1, duration: 180, useNativeDriver: true }).start();
+      });
+    }, 3500);
+    return () => clearInterval(interval);
   }, []);
 
   const openForm = () => {
@@ -264,9 +280,11 @@ export default function App() {
                   I help couples create deeper intimacy, heal,{'\n'}and build a
                   relationship that feels safe,{'\n'}passionate, and unshakable.
                 </Text>
-                <TouchableOpacity style={styles.connectBtn} activeOpacity={0.85} onPress={openForm}>
-                  <Text style={styles.connectBtnText}>Schedule Sessions 24/7</Text>
-                </TouchableOpacity>
+                <Animated.View style={{ transform: [{ scaleY: btnFlip }] }}>
+                  <TouchableOpacity style={styles.connectBtn} activeOpacity={0.85} onPress={openForm}>
+                    <Text style={styles.connectBtnText}>{BTN_LABELS[btnIndex]}</Text>
+                  </TouchableOpacity>
+                </Animated.View>
               </View>
               <View style={styles.heroRightDesktop}>
                 <Animated.Image
@@ -294,9 +312,11 @@ export default function App() {
                   I help couples create deeper intimacy, heal, and build a
                   relationship that feels safe, passionate, and unshakable.
                 </Text>
-                <TouchableOpacity style={styles.connectBtn} activeOpacity={0.85} onPress={openForm}>
-                  <Text style={styles.connectBtnText}>Schedule Sessions 24/7</Text>
-                </TouchableOpacity>
+                <Animated.View style={{ transform: [{ scaleY: btnFlip }] }}>
+                  <TouchableOpacity style={styles.connectBtn} activeOpacity={0.85} onPress={openForm}>
+                    <Text style={styles.connectBtnText}>{BTN_LABELS[btnIndex]}</Text>
+                  </TouchableOpacity>
+                </Animated.View>
               </View>
             </View>
           )}
