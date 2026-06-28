@@ -97,6 +97,12 @@ const SOCIALS = [
   { icon: 'logo-tiktok', label: 'TikTok', url: 'https://tiktok.com/@builtonintimacy' },
 ];
 
+const HOW_IT_WORKS = [
+  { step: '01', title: 'Book a Session', desc: 'Choose a time that fits your schedule — mornings, evenings, or weekends. No waiting rooms, no commute.' },
+  { step: '02', title: 'Complete Your Assessment', desc: 'Share your relationship goals and challenges so your coach can tailor every session specifically to you.' },
+  { step: '03', title: 'Start Your Journey', desc: 'Meet with Fateemah and begin building the skills, tools, and intimacy that transform your partnership.' },
+];
+
 const BENEFITS = [
   { icon: 'person-outline',       title: '1-on-1 Personalized Coaching', desc: 'Every session is tailored to your unique relationship dynamic — no generic advice, ever.' },
   { icon: 'bulb-outline',         title: 'Proven Frameworks',            desc: 'Evidence-based tools that create lasting change, not just temporary fixes.' },
@@ -130,6 +136,11 @@ export default function App() {
   const [activeFeature, setActiveFeature] = useState(null);
   const [videoPlaying, setVideoPlaying]   = useState(false);
   const [btnIndex, setBtnIndex]           = useState(0);
+  const [authOpen, setAuthOpen]           = useState(false);
+  const [authTab, setAuthTab]             = useState('login');
+  const [authName, setAuthName]           = useState('');
+  const [authEmail, setAuthEmail]         = useState('');
+  const [authPass, setAuthPass]           = useState('');
 
   const videoW = isDesktop ? Math.min(width - 120, 960) : width - 56;
   const videoH = Math.round(videoW * 9 / 16);
@@ -235,7 +246,7 @@ export default function App() {
               <TouchableOpacity style={styles.bookBtn} activeOpacity={0.85} onPress={openForm}>
                 <Text style={styles.bookBtnText}>Book a Call</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.profileBtn} activeOpacity={0.7}>
+              <TouchableOpacity style={styles.profileBtn} activeOpacity={0.7} onPress={() => setAuthOpen(true)}>
                 <Ionicons name="person-circle-outline" size={34} color={C.white} />
               </TouchableOpacity>
             </View>
@@ -244,7 +255,7 @@ export default function App() {
               <TouchableOpacity style={styles.navGetStartedBtn} activeOpacity={0.85} onPress={openForm}>
                 <Text style={styles.navGetStartedText}>Get Started</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.profileBtn} activeOpacity={0.7}>
+              <TouchableOpacity style={styles.profileBtn} activeOpacity={0.7} onPress={() => setAuthOpen(true)}>
                 <Ionicons name="person-circle-outline" size={32} color={C.white} />
               </TouchableOpacity>
               <TouchableOpacity style={styles.hamburger} activeOpacity={0.7} onPress={() => setMenuOpen(true)}>
@@ -310,6 +321,8 @@ export default function App() {
                   style={[styles.coupleImgMobile, { transform: [{ translateY: coupleTranslate }] }]}
                   resizeMode="cover"
                 />
+                {/* gradient fades the bottom of the couple into the content below */}
+                <View style={styles.heroCoupleGradient} />
               </View>
               <View style={styles.heroTextMobile}>
                 <Text style={[styles.heroHeading, serifWeb]}>
@@ -424,6 +437,22 @@ export default function App() {
           </View>
         </View>
 
+        {/* ── HOW IT WORKS ── */}
+        <View style={[styles.howSection, isDesktop && styles.howSectionDesktop]}>
+          <Text style={styles.sectionLabel}>Simple Process</Text>
+          <Text style={[styles.sectionHeading, serifWeb]}>How It Works</Text>
+          <View style={[styles.howSteps, isDesktop && styles.howStepsDesktop]}>
+            {HOW_IT_WORKS.map((s, i) => (
+              <View key={s.step} style={[styles.howStep, isDesktop && styles.howStepDesktop]}>
+                <Text style={[styles.howStepNumber, geoWeb]}>{s.step}</Text>
+                <View style={styles.howStepLine} />
+                <Text style={[styles.howStepTitle, geoWeb]}>{s.title}</Text>
+                <Text style={styles.howStepDesc}>{s.desc}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
         {/* ── BENEFITS ── */}
         <View style={[styles.benefitsSection, isDesktop && styles.benefitsSectionDesktop]}>
           <Text style={styles.sectionLabel}>Why Us</Text>
@@ -432,13 +461,13 @@ export default function App() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.benefitsScroll}
-            style={styles.benefitsScrollView}
+            style={[styles.benefitsScrollView, isWeb && { scrollSnapType: 'x mandatory' }]}
             snapToInterval={256}
             snapToAlignment="start"
             decelerationRate="fast"
           >
             {BENEFITS.map((b) => (
-              <View key={b.title} style={styles.benefitCard}>
+              <View key={b.title} style={[styles.benefitCard, isWeb && { scrollSnapAlign: 'start' }]}>
                 <View style={styles.benefitIconWrap}>
                   <Ionicons name={b.icon} size={28} color={C.copper} />
                 </View>
@@ -474,6 +503,24 @@ export default function App() {
               </View>
             ))}
           </View>
+        </View>
+
+        {/* ── CTA CLOSER ── */}
+        <View style={styles.ctaSection}>
+          <View style={styles.ctaHeart}>
+            <Ionicons name="heart" size={isDesktop ? 220 : 160} color="rgba(201,136,104,0.12)" />
+          </View>
+          <Text style={[styles.ctaHeading, serifWeb]}>
+            Don't Settle for Less.
+          </Text>
+          <Text style={[styles.ctaScript, scriptWeb]}>Make your love life come to life.</Text>
+          <Text style={styles.ctaBody}>
+            Your relationship deserves the same care and investment as everything else in your life.
+            Take the first step today.
+          </Text>
+          <TouchableOpacity style={styles.ctaBtn} activeOpacity={0.85} onPress={openForm}>
+            <Text style={styles.ctaBtnText}>Start Your Journey</Text>
+          </TouchableOpacity>
         </View>
 
         {/* ── SOCIAL ── */}
@@ -650,6 +697,102 @@ export default function App() {
           </ScrollView>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* ── AUTH MODAL ── */}
+      <Modal visible={authOpen} animationType="slide" transparent={false} onRequestClose={() => setAuthOpen(false)}>
+        <KeyboardAvoidingView style={styles.authWrap} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <ScrollView contentContainerStyle={styles.authScroll} keyboardShouldPersistTaps="handled">
+            <View style={styles.formHeader}>
+              <Text style={styles.formTitle}>
+                {authTab === 'login' ? 'Welcome Back' : 'Create Account'}
+              </Text>
+              <TouchableOpacity onPress={() => setAuthOpen(false)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+                <Ionicons name="close" size={28} color={C.white} />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.formSubtitle}>
+              {authTab === 'login'
+                ? 'Sign in to manage your sessions and progress.'
+                : 'Join BuiltOnIntimacy and start your journey today.'}
+            </Text>
+
+            {/* tabs */}
+            <View style={styles.authTabs}>
+              <TouchableOpacity
+                style={[styles.authTab, authTab === 'login' && styles.authTabActive]}
+                onPress={() => setAuthTab('login')}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.authTabText, authTab === 'login' && styles.authTabTextActive]}>Sign In</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.authTab, authTab === 'register' && styles.authTabActive]}
+                onPress={() => setAuthTab('register')}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.authTabText, authTab === 'register' && styles.authTabTextActive]}>Register</Text>
+              </TouchableOpacity>
+            </View>
+
+            {authTab === 'register' && (
+              <>
+                <Text style={styles.formLabel}>Full Name *</Text>
+                <TextInput
+                  style={styles.formInput}
+                  placeholder="Jane Smith"
+                  placeholderTextColor={C.muted}
+                  value={authName}
+                  onChangeText={setAuthName}
+                  returnKeyType="next"
+                />
+              </>
+            )}
+
+            <Text style={styles.formLabel}>Email Address *</Text>
+            <TextInput
+              style={styles.formInput}
+              placeholder="jane@email.com"
+              placeholderTextColor={C.muted}
+              value={authEmail}
+              onChangeText={setAuthEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              returnKeyType="next"
+            />
+
+            <Text style={styles.formLabel}>Password *</Text>
+            <TextInput
+              style={styles.formInput}
+              placeholder="••••••••"
+              placeholderTextColor={C.muted}
+              value={authPass}
+              onChangeText={setAuthPass}
+              secureTextEntry
+              returnKeyType="done"
+            />
+
+            <TouchableOpacity
+              style={[styles.connectBtn, { alignSelf: 'stretch', alignItems: 'center', marginTop: 8 }]}
+              activeOpacity={0.85}
+              onPress={() => setAuthOpen(false)}
+            >
+              <Text style={styles.connectBtnText}>
+                {authTab === 'login' ? 'Sign In' : 'Create Account'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{ marginTop: 20, alignItems: 'center' }}
+              activeOpacity={0.7}
+              onPress={() => setAuthTab(authTab === 'login' ? 'register' : 'login')}
+            >
+              <Text style={{ color: C.copper, fontSize: 14 }}>
+                {authTab === 'login' ? "Don't have an account? Register" : 'Already have an account? Sign In'}
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </Modal>
     </>
   );
 }
@@ -697,10 +840,23 @@ const styles = StyleSheet.create({
   /* ── HERO ── */
   hero: { overflow: 'hidden', backgroundColor: C.bg },
   heroDesktop: { minHeight: 600 },
-  heroMobile: { minHeight: 580 },
+  heroMobile: { minHeight: 620 },
   heroBg: { position: 'absolute', top: 0, left: 0, right: 0, width: '100%' },
   heroBgDesktop: { height: 760 },
-  heroBgMobile: { height: 700 },
+  heroBgMobile: { height: 760 },
+  heroColMobile: { flex: 1, minHeight: 620 },
+  heroCoupleWrapMobile: { height: 420, overflow: 'hidden' },
+  coupleImgMobile: { width: '100%', height: 420 },
+  heroCoupleGradient: {
+    position: 'absolute', left: 0, right: 0, bottom: 0, height: 140,
+    backgroundImage: 'linear-gradient(to bottom, transparent 0%, rgba(10,10,10,0.82) 60%, rgba(10,10,10,1) 100%)',
+  },
+  heroTextMobile: {
+    paddingHorizontal: 28,
+    paddingTop: 4,
+    paddingBottom: 52,
+    marginTop: -80,
+  },
   heroRowDesktop: { flexDirection: 'row', alignItems: 'flex-end', minHeight: 600 },
   heroOverlay: { paddingHorizontal: 28, paddingVertical: 60, justifyContent: 'center' },
   heroOverlayDesktop: {
@@ -718,15 +874,6 @@ const styles = StyleSheet.create({
     height: 600,
     justifyContent: 'flex-end',
     alignItems: 'center',
-  },
-  heroColMobile: { flex: 1, minHeight: 580 },
-  heroCoupleWrapMobile: { height: 360, overflow: 'hidden' },
-  coupleImgMobile: { width: '100%', height: 360 },
-  heroTextMobile: {
-    backgroundColor: 'rgba(0,0,0,0.55)',
-    paddingHorizontal: 28,
-    paddingTop: 28,
-    paddingBottom: 48,
   },
   heroBodyMobile: { color: C.muted, fontSize: 15, lineHeight: 24, marginBottom: 32 },
   heroHeading: { color: C.white, fontSize: 34, fontWeight: '700', lineHeight: 44, marginBottom: 10 },
@@ -988,6 +1135,69 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 20,
   },
+
+  /* ── HOW IT WORKS ── */
+  howSection: {
+    backgroundColor: C.bg,
+    paddingVertical: 72,
+    paddingHorizontal: 28,
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: C.divider,
+  },
+  howSectionDesktop: { paddingHorizontal: 80 },
+  howSteps: { width: '100%', gap: 32, marginTop: 16 },
+  howStepsDesktop: { flexDirection: 'row', justifyContent: 'center', gap: 40 },
+  howStep: { flex: 1, maxWidth: 340 },
+  howStepDesktop: { alignItems: 'flex-start' },
+  howStepNumber: { color: C.copper, fontSize: 40, fontWeight: '700', opacity: 0.5, marginBottom: 8 },
+  howStepLine: { width: 40, height: 2, backgroundColor: C.copper, opacity: 0.4, marginBottom: 16 },
+  howStepTitle: { color: C.white, fontSize: 18, fontWeight: '700', marginBottom: 10 },
+  howStepDesc: { color: C.muted, fontSize: 14, lineHeight: 22 },
+
+  /* ── CTA CLOSER ── */
+  ctaSection: {
+    backgroundColor: C.maroon,
+    paddingVertical: 80,
+    paddingHorizontal: 28,
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  ctaHeart: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -110 }, { translateY: -110 }],
+  },
+  ctaHeading: { color: C.white, fontSize: 36, fontWeight: '700', textAlign: 'center', marginBottom: 12, zIndex: 1 },
+  ctaScript: { color: C.copper, fontSize: 28, textAlign: 'center', marginBottom: 20, zIndex: 1 },
+  ctaBody: { color: C.muted, fontSize: 15, lineHeight: 24, textAlign: 'center', maxWidth: 460, marginBottom: 40, zIndex: 1 },
+  ctaBtn: {
+    backgroundColor: C.copper,
+    paddingVertical: 16,
+    paddingHorizontal: 40,
+    borderRadius: 50,
+    zIndex: 1,
+  },
+  ctaBtnText: { color: '#1a0606', fontSize: 16, fontWeight: '700' },
+
+  /* ── AUTH MODAL ── */
+  authWrap: { flex: 1, backgroundColor: C.bg },
+  authScroll: { flexGrow: 1, paddingHorizontal: 28, paddingTop: 52, paddingBottom: 48 },
+  authTabs: {
+    flexDirection: 'row',
+    backgroundColor: '#150505',
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 32,
+    gap: 4,
+  },
+  authTab: { flex: 1, paddingVertical: 10, borderRadius: 9, alignItems: 'center' },
+  authTabActive: { backgroundColor: C.maroon },
+  authTabText: { color: C.muted, fontSize: 14, fontWeight: '600' },
+  authTabTextActive: { color: C.white },
 
   /* ── CONTACT FORM ── */
   formScroll: { flexGrow: 1, paddingHorizontal: 28, paddingTop: 24, paddingBottom: 48 },
