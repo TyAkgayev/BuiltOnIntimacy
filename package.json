@@ -18,5 +18,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "puppeteer": "^25.2.1"
+  }
 }
