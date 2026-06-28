@@ -14,7 +14,7 @@ import {
   useWindowDimensions,
   ScrollView,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 if (Platform.OS === 'web') {
   const link = document.createElement('link');
@@ -91,10 +91,10 @@ const TESTIMONIALS = [
 ];
 
 const SOCIALS = [
-  { icon: 'logo-instagram', label: 'Instagram', url: 'https://instagram.com/builtonintimacy' },
-  { icon: 'logo-facebook', label: 'Facebook', url: 'https://facebook.com/builtonintimacy' },
-  { icon: 'logo-youtube', label: 'YouTube', url: 'https://youtube.com/@builtonintimacy' },
-  { icon: 'logo-tiktok', label: 'TikTok', url: 'https://tiktok.com/@builtonintimacy' },
+  { lib: 'Ionicons',              icon: 'logo-instagram', label: 'Instagram', url: 'https://instagram.com/mrsjobe_tehrelationshipbuilder', color: '#E1306C' },
+  { lib: 'MaterialCommunityIcons', icon: 'snapchat',      label: 'Snapchat',  url: 'https://snapchat.com/add/Mssexi_independent',          color: '#FFFC00' },
+  { lib: 'Ionicons',              icon: 'logo-tiktok',    label: 'TikTok',    url: 'https://tiktok.com/@mrsjobe24_7relations',              color: '#ffffff' },
+  { lib: 'Ionicons',              icon: 'logo-youtube',   label: 'YouTube',   url: 'https://www.youtube.com/@Mrsjobe',                      color: '#FF0000' },
 ];
 
 const HOW_IT_WORKS = [
@@ -119,7 +119,7 @@ export default function App() {
   const isMobileLandscape = !isDesktop && width > height;
 
   const COUPLE_RATIO = 1536 / 1024;
-  const coupleW = Math.max(300, Math.min(780, width * 0.45));
+  const coupleW = Math.min(680, Math.max(420, height * 0.72));
   const coupleH = Math.round(coupleW / COUPLE_RATIO);
 
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -587,7 +587,10 @@ export default function App() {
                 activeOpacity={0.75}
                 onPress={() => Linking.openURL(s.url)}
               >
-                <Ionicons name={s.icon} size={26} color={C.copper} />
+                {s.lib === 'MaterialCommunityIcons'
+                  ? <MaterialCommunityIcons name={s.icon} size={26} color={s.color} />
+                  : <Ionicons name={s.icon} size={26} color={s.color} />
+                }
                 <Text style={styles.socialLabel}>{s.label}</Text>
               </TouchableOpacity>
             ))}
@@ -939,10 +942,10 @@ const styles = StyleSheet.create({
   },
   heroRightDesktop: {
     flex: 1,
-    minWidth: 300,
     height: 600,
     justifyContent: 'flex-end',
     alignItems: 'center',
+    overflow: 'hidden',
   },
   heroBodyMobile: { color: C.muted, fontSize: 15, lineHeight: 24, marginBottom: 32 },
   heroHeading: { color: C.white, fontSize: 34, fontWeight: '700', lineHeight: 44, marginBottom: 10 },
