@@ -114,8 +114,9 @@ const BENEFITS = [
 
 export default function App() {
   const isWeb = Platform.OS === 'web';
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 820;
+  const { width, height } = useWindowDimensions();
+  const isDesktop = width >= 820 && height > 500;
+  const isMobileLandscape = !isDesktop && width > height;
 
   const COUPLE_RATIO = 1536 / 1024;
   const coupleW = Math.max(300, Math.min(780, width * 0.45));
@@ -141,6 +142,18 @@ export default function App() {
   const [authName, setAuthName]           = useState('');
   const [authEmail, setAuthEmail]         = useState('');
   const [authPass, setAuthPass]           = useState('');
+  const [activeBenefitIdx, setActiveBenefitIdx] = useState(0);
+
+  const benefitPeek = 44;
+  const benefitGap = 12;
+  const benefitCardW = width - 2 * benefitPeek;
+  const benefitSnapInterval = benefitCardW + benefitGap;
+
+  const onBenefitScroll = (e) => {
+    const x = e.nativeEvent.contentOffset.x;
+    const idx = Math.round(x / benefitSnapInterval);
+    setActiveBenefitIdx(Math.max(0, Math.min(idx, BENEFITS.length - 1)));
+  };
 
   const videoW = isDesktop ? Math.min(width - 120, 960) : width - 56;
   const videoH = Math.round(videoW * 9 / 16);
@@ -275,7 +288,7 @@ export default function App() {
         >
 
         {/* ── HERO ── */}
-        <View style={[styles.hero, isDesktop ? styles.heroDesktop : styles.heroMobile]}>
+        <View style={[styles.hero, isDesktop ? styles.heroDesktop : isMobileLandscape ? styles.heroLandscape : styles.heroMobile]}>
           <Animated.Image
             source={require('./assets/couple_back.png')}
             style={[
@@ -313,7 +326,33 @@ export default function App() {
                 />
               </View>
             </View>
+          ) : isMobileLandscape ? (
+            /* ── Landscape phone: text left, couple right ── */
+            <View style={[styles.heroColMobile, styles.heroLandscapeRow]}>
+              <View style={styles.heroTextLandscape}>
+                <Text style={[styles.heroHeading, styles.heroHeadingLandscape, serifWeb]}>
+                  Better Connection.{'\n'}Better Love.
+                </Text>
+                <Text style={[styles.heroScript, styles.heroScriptLandscape, scriptWeb]}>
+                  Built on Intimacy.
+                </Text>
+                <Animated.View style={{ transform: [{ scaleY: btnFlip }] }}>
+                  <TouchableOpacity style={styles.connectBtn} activeOpacity={0.85} onPress={openForm}>
+                    <Text style={styles.connectBtnText}>{BTN_LABELS[btnIndex]}</Text>
+                  </TouchableOpacity>
+                </Animated.View>
+              </View>
+              <View style={styles.heroCoupleWrapLandscape}>
+                <Animated.Image
+                  source={require('./assets/couple.png')}
+                  style={[styles.coupleImgLandscape, { transform: [{ translateY: coupleTranslate }] }]}
+                  resizeMode="cover"
+                />
+                <View style={styles.heroCoupleGradientLeft} />
+              </View>
+            </View>
           ) : (
+            /* ── Portrait phone: couple on top, text below ── */
             <View style={styles.heroColMobile}>
               <View style={styles.heroCoupleWrapMobile}>
                 <Animated.Image
@@ -460,14 +499,19 @@ export default function App() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.benefitsScroll}
-            style={[styles.benefitsScrollView, isWeb && { scrollSnapType: 'x mandatory' }]}
-            snapToInterval={256}
+            snapToInterval={benefitSnapInterval}
             snapToAlignment="start"
             decelerationRate="fast"
+            contentContainerStyle={styles.benefitsScroll}
+            style={[styles.benefitsScrollView, isWeb && { scrollSnapType: 'x mandatory' }]}
+            onScroll={onBenefitScroll}
+            scrollEventThrottle={16}
           >
             {BENEFITS.map((b) => (
-              <View key={b.title} style={[styles.benefitCard, isWeb && { scrollSnapAlign: 'start' }]}>
+              <View
+                key={b.title}
+                style={[styles.benefitCard, { width: benefitCardW }, isWeb && { scrollSnapAlign: 'start' }]}
+              >
                 <View style={styles.benefitIconWrap}>
                   <Ionicons name={b.icon} size={28} color={C.copper} />
                 </View>
@@ -476,7 +520,15 @@ export default function App() {
               </View>
             ))}
           </ScrollView>
-          <TouchableOpacity style={[styles.connectBtn, { marginTop: 40, alignSelf: 'center' }]} activeOpacity={0.85} onPress={openForm}>
+          <View style={styles.benefitDots}>
+            {BENEFITS.map((_, i) => (
+              <View
+                key={i}
+                style={[styles.benefitDot, i === activeBenefitIdx && styles.benefitDotActive]}
+              />
+            ))}
+          </View>
+          <TouchableOpacity style={[styles.connectBtn, { marginTop: 32, alignSelf: 'center' }]} activeOpacity={0.85} onPress={openForm}>
             <Text style={styles.connectBtnText}>Get Started</Text>
           </TouchableOpacity>
         </View>
@@ -841,16 +893,33 @@ const styles = StyleSheet.create({
   hero: { overflow: 'hidden', backgroundColor: C.bg },
   heroDesktop: { minHeight: 600 },
   heroMobile: { minHeight: 620 },
+  heroLandscape: { flex: 1 },
   heroBg: { position: 'absolute', top: 0, left: 0, right: 0, width: '100%' },
   heroBgDesktop: { height: 760 },
   heroBgMobile: { height: 760 },
   heroColMobile: { flex: 1, minHeight: 620 },
+  heroLandscapeRow: { flexDirection: 'row', minHeight: 0, flex: 1 },
   heroCoupleWrapMobile: { height: 420, overflow: 'hidden' },
   coupleImgMobile: { width: '100%', height: 420 },
+  heroCoupleWrapLandscape: { flex: 1, overflow: 'hidden' },
+  coupleImgLandscape: { width: '100%', height: '100%' },
   heroCoupleGradient: {
     position: 'absolute', left: 0, right: 0, bottom: 0, height: 140,
     backgroundImage: 'linear-gradient(to bottom, transparent 0%, rgba(10,10,10,0.82) 60%, rgba(10,10,10,1) 100%)',
   },
+  heroCoupleGradientLeft: {
+    position: 'absolute', top: 0, left: 0, bottom: 0, width: 80,
+    backgroundImage: 'linear-gradient(to right, rgba(10,10,10,0.9) 0%, transparent 100%)',
+  },
+  heroTextLandscape: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 28,
+    paddingVertical: 16,
+    zIndex: 2,
+  },
+  heroHeadingLandscape: { fontSize: 24, lineHeight: 30, marginBottom: 6 },
+  heroScriptLandscape: { fontSize: 22, lineHeight: 28, marginBottom: 14 },
   heroTextMobile: {
     paddingHorizontal: 28,
     paddingTop: 4,
@@ -1099,20 +1168,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   benefitsSectionDesktop: { paddingVertical: 72 },
-  benefitsScrollView: { alignSelf: 'stretch' },
+  benefitsScrollView: { alignSelf: 'stretch', overflow: 'hidden' },
   benefitsScroll: {
-    paddingHorizontal: 28,
-    gap: 16,
+    paddingHorizontal: 44,
+    gap: 12,
     paddingBottom: 8,
   },
   benefitCard: {
     backgroundColor: 'rgba(255,255,255,0.05)',
     borderWidth: 1,
     borderColor: C.divider,
-    borderRadius: 14,
-    padding: 24,
-    width: 240,
+    borderRadius: 16,
+    padding: 28,
     alignItems: 'flex-start',
+  },
+  benefitDots: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  benefitDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+  },
+  benefitDotActive: {
+    width: 24,
+    backgroundColor: C.copper,
   },
   benefitIconWrap: {
     width: 52,
