@@ -34,16 +34,67 @@ const C = {
   muted: '#cdb8b0',
 };
 
-// Replace with your actual contact email or booking URL
 const CONTACT_EMAIL = 'hello@builtonintimacy.com';
 
 const NAV_LINKS = ['About', 'Coaching', 'Programs', 'Resources', 'Blog'];
 
 const FEATURES = [
-  { icon: 'heart-outline',              title: 'Reconnect',       desc: 'Reignite emotional closeness and understanding.' },
-  { icon: 'chatbubble-ellipses-outline',title: 'Communicate',     desc: 'Learn tools for honest, respectful, and open conversations.' },
-  { icon: 'flame-outline',              title: 'Intimacy',        desc: 'Deepen emotional and physical intimacy.' },
-  { icon: 'shield-checkmark-outline',   title: 'Stronger Together', desc: 'Build a relationship that can weather any season.' },
+  {
+    icon: 'heart-outline',
+    title: 'Reconnect',
+    desc: 'Reignite emotional closeness and understanding.',
+    detail:
+      'Rediscover the deep emotional bond that first brought you together. Through guided exercises and meaningful conversations, we help couples rebuild trust, restore warmth, and rekindle the friendship at the heart of your relationship — so you feel like partners again, not just housemates.',
+  },
+  {
+    icon: 'chatbubble-ellipses-outline',
+    title: 'Communicate',
+    desc: 'Learn tools for honest, respectful, and open conversations.',
+    detail:
+      'Master the art of truly listening and being heard. We teach proven communication frameworks that help couples navigate difficult topics with empathy, reduce defensiveness, and turn conflict into connection — creating conversations that bring you closer instead of pushing you apart.',
+  },
+  {
+    icon: 'flame-outline',
+    title: 'Intimacy',
+    desc: 'Deepen emotional and physical intimacy.',
+    detail:
+      'Intimacy is more than physical — it\'s about feeling truly seen, desired, and cherished. We guide couples in exploring both emotional and physical closeness, helping you create a safe space for vulnerability and desire so that your connection deepens naturally and sustainably.',
+  },
+  {
+    icon: 'shield-checkmark-outline',
+    title: 'Stronger Together',
+    desc: 'Build a relationship that can weather any season.',
+    detail:
+      'Build the foundation for a partnership that grows stronger through every challenge. We equip couples with conflict resolution tools, shared values alignment, and a resilient mindset — so your relationship becomes your greatest source of strength no matter what life brings.',
+  },
+];
+
+const TESTIMONIALS = [
+  {
+    quote:
+      'We were on the verge of separation when we started coaching. Six months later, we have the relationship we always dreamed of. The tools we learned changed everything.',
+    name: 'Marcus & Leila',
+    detail: 'Married 8 years',
+  },
+  {
+    quote:
+      'I never knew how much unspoken resentment was holding us back. The communication work we did unlocked a level of understanding I didn\'t think was possible.',
+    name: 'Jordan & Priya',
+    detail: 'Together 5 years',
+  },
+  {
+    quote:
+      'The intimacy coaching was transformative. We went from feeling like roommates to truly feeling like partners again. I\'m so grateful we made this investment.',
+    name: 'David & Sofia',
+    detail: 'Married 12 years',
+  },
+];
+
+const SOCIALS = [
+  { icon: 'logo-instagram', label: 'Instagram', url: 'https://instagram.com/builtonintimacy' },
+  { icon: 'logo-facebook', label: 'Facebook', url: 'https://facebook.com/builtonintimacy' },
+  { icon: 'logo-youtube', label: 'YouTube', url: 'https://youtube.com/@builtonintimacy' },
+  { icon: 'logo-tiktok', label: 'TikTok', url: 'https://tiktok.com/@builtonintimacy' },
 ];
 
 export default function App() {
@@ -51,20 +102,20 @@ export default function App() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 820;
 
-  // couple.png is 1536×1024 (1.5:1). Width drives size so the container
-  // matches the natural ratio — no letterboxing, no floating.
   const COUPLE_RATIO = 1536 / 1024;
   const coupleW = Math.max(300, Math.min(780, width * 0.45));
   const coupleH = Math.round(coupleW / COUPLE_RATIO);
 
   const scrollY = useRef(new Animated.Value(0)).current;
+  const featureScales = useRef(FEATURES.map(() => new Animated.Value(1))).current;
 
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [formOpen, setFormOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [name, setName] = useState('');
-  const [contact, setContact] = useState('');
-  const [message, setMessage] = useState('');
+  const [menuOpen, setMenuOpen]       = useState(false);
+  const [formOpen, setFormOpen]       = useState(false);
+  const [submitted, setSubmitted]     = useState(false);
+  const [name, setName]               = useState('');
+  const [contact, setContact]         = useState('');
+  const [message, setMessage]         = useState('');
+  const [activeFeature, setActiveFeature] = useState(null);
 
   const openForm = () => {
     setSubmitted(false);
@@ -84,6 +135,14 @@ export default function App() {
     setSubmitted(true);
   };
 
+  const pressFeature = (index) => {
+    Animated.sequence([
+      Animated.timing(featureScales[index], { toValue: 0.92, duration: 100, useNativeDriver: true }),
+      Animated.spring(featureScales[index], { toValue: 1, friction: 4, tension: 160, useNativeDriver: true }),
+    ]).start();
+    setActiveFeature(FEATURES[index]);
+  };
+
   const bgTranslate = scrollY.interpolate({
     inputRange: [0, 700],
     outputRange: [0, 154],
@@ -100,6 +159,10 @@ export default function App() {
     { useNativeDriver: false }
   );
 
+  const serifWeb = isWeb ? { fontFamily: '"Playfair Display", Georgia, serif' } : {};
+  const scriptWeb = isWeb ? { fontFamily: '"Great Vibes", cursive' } : {};
+  const geoWeb = isWeb ? { fontFamily: 'Georgia, serif' } : {};
+
   return (
     <>
       <Animated.ScrollView
@@ -112,9 +175,7 @@ export default function App() {
 
         {/* ── NAV ── */}
         <View style={[styles.nav, isDesktop && styles.navDesktop]}>
-          <Text style={[styles.logo, isWeb && styles.logoWeb]}>
-            BuiltOnIntimacy.com
-          </Text>
+          <Text style={[styles.logo, isWeb && styles.logoWeb]}>BuiltOnIntimacy.com</Text>
           {isDesktop ? (
             <View style={[styles.navLinks, { gap: width >= 1200 ? 36 : 18 }]}>
               {NAV_LINKS.map((item) => (
@@ -150,12 +211,10 @@ export default function App() {
           {isDesktop ? (
             <View style={styles.heroRowDesktop}>
               <View style={[styles.heroOverlay, styles.heroOverlayDesktop]}>
-                <Text style={[styles.heroHeading, styles.heroHeadingDesktop,
-                  isWeb && { fontFamily: '"Playfair Display", Georgia, serif' }]}>
+                <Text style={[styles.heroHeading, styles.heroHeadingDesktop, serifWeb]}>
                   Better Connection.{'\n'}Better Love.
                 </Text>
-                <Text style={[styles.heroScript, styles.heroScriptDesktop,
-                  isWeb && { fontFamily: '"Great Vibes", cursive' }]}>
+                <Text style={[styles.heroScript, styles.heroScriptDesktop, scriptWeb]}>
                   Built on Intimacy.
                 </Text>
                 <Text style={styles.heroBody}>
@@ -184,14 +243,10 @@ export default function App() {
                 />
               </View>
               <View style={styles.heroTextMobile}>
-                <Text style={[styles.heroHeading,
-                  isWeb && { fontFamily: '"Playfair Display", Georgia, serif' }]}>
+                <Text style={[styles.heroHeading, serifWeb]}>
                   Better Connection.{'\n'}Better Love.
                 </Text>
-                <Text style={[styles.heroScript,
-                  isWeb && { fontFamily: '"Great Vibes", cursive' }]}>
-                  Built on Intimacy.
-                </Text>
+                <Text style={[styles.heroScript, scriptWeb]}>Built on Intimacy.</Text>
                 <Text style={styles.heroBodyMobile}>
                   I help couples create deeper intimacy, heal, and build a
                   relationship that feels safe, passionate, and unshakable.
@@ -209,13 +264,14 @@ export default function App() {
           <View style={styles.featuresDesktop}>
             {FEATURES.map((f, i) => (
               <View key={f.title} style={styles.featureRowDesktop}>
-                <View style={styles.featureItemDesktop}>
-                  <Ionicons name={f.icon} size={38} color={C.copper} />
-                  <Text style={[styles.featureTitle, isWeb && { fontFamily: 'Georgia, serif' }]}>
-                    {f.title}
-                  </Text>
-                  <Text style={styles.featureDesc}>{f.desc}</Text>
-                </View>
+                <Animated.View style={[styles.featureItemDesktop, { transform: [{ scale: featureScales[i] }] }]}>
+                  <TouchableOpacity onPress={() => pressFeature(i)} activeOpacity={1} style={styles.featureTouchable}>
+                    <Ionicons name={f.icon} size={38} color={C.copper} />
+                    <Text style={[styles.featureTitle, geoWeb]}>{f.title}</Text>
+                    <Text style={styles.featureDesc}>{f.desc}</Text>
+                    <Text style={styles.featureTapHint}>Learn more →</Text>
+                  </TouchableOpacity>
+                </Animated.View>
                 {i < FEATURES.length - 1 && <View style={styles.featureDivider} />}
               </View>
             ))}
@@ -224,32 +280,125 @@ export default function App() {
           <View style={styles.featuresMobile}>
             <View style={styles.featureGridRow}>
               {FEATURES.slice(0, 2).map((f, i) => (
-                <View key={f.title} style={[styles.featureGridCell, i === 0 && styles.featureGridCellBorder]}>
-                  <Ionicons name={f.icon} size={32} color={C.copper} />
-                  <Text style={[styles.featureTitle, styles.featureTitleMobile,
-                    isWeb && { fontFamily: 'Georgia, serif' }]}>
-                    {f.title}
-                  </Text>
-                  <Text style={styles.featureDesc}>{f.desc}</Text>
-                </View>
+                <Animated.View
+                  key={f.title}
+                  style={[
+                    styles.featureGridCell,
+                    i === 0 && styles.featureGridCellBorder,
+                    { transform: [{ scale: featureScales[i] }] },
+                  ]}
+                >
+                  <TouchableOpacity onPress={() => pressFeature(i)} activeOpacity={1} style={styles.featureTouchable}>
+                    <Ionicons name={f.icon} size={32} color={C.copper} />
+                    <Text style={[styles.featureTitle, styles.featureTitleMobile, geoWeb]}>{f.title}</Text>
+                    <Text style={styles.featureDesc}>{f.desc}</Text>
+                    <Text style={styles.featureTapHintMobile}>Tap →</Text>
+                  </TouchableOpacity>
+                </Animated.View>
               ))}
             </View>
             <View style={styles.featureGridDividerH} />
             <View style={styles.featureGridRow}>
               {FEATURES.slice(2, 4).map((f, i) => (
-                <View key={f.title} style={[styles.featureGridCell, i === 0 && styles.featureGridCellBorder]}>
-                  <Ionicons name={f.icon} size={32} color={C.copper} />
-                  <Text style={[styles.featureTitle, styles.featureTitleMobile,
-                    isWeb && { fontFamily: 'Georgia, serif' }]}>
-                    {f.title}
-                  </Text>
-                  <Text style={styles.featureDesc}>{f.desc}</Text>
-                </View>
+                <Animated.View
+                  key={f.title}
+                  style={[
+                    styles.featureGridCell,
+                    i === 0 && styles.featureGridCellBorder,
+                    { transform: [{ scale: featureScales[i + 2] }] },
+                  ]}
+                >
+                  <TouchableOpacity onPress={() => pressFeature(i + 2)} activeOpacity={1} style={styles.featureTouchable}>
+                    <Ionicons name={f.icon} size={32} color={C.copper} />
+                    <Text style={[styles.featureTitle, styles.featureTitleMobile, geoWeb]}>{f.title}</Text>
+                    <Text style={styles.featureDesc}>{f.desc}</Text>
+                    <Text style={styles.featureTapHintMobile}>Tap →</Text>
+                  </TouchableOpacity>
+                </Animated.View>
               ))}
             </View>
           </View>
         )}
+
+        {/* ── TESTIMONIALS ── */}
+        <View style={[styles.testimonialsSection, isDesktop && styles.testimonialsSectionDesktop]}>
+          <Text style={[styles.sectionLabel]}>What Couples Are Saying</Text>
+          <Text style={[styles.sectionHeading, serifWeb]}>Real Stories.{'\n'}Real Results.</Text>
+          <View style={[styles.testimonialsRow, isDesktop && styles.testimonialsRowDesktop]}>
+            {TESTIMONIALS.map((t, i) => (
+              <View
+                key={t.name}
+                style={[
+                  styles.testimonialCard,
+                  isDesktop && styles.testimonialCardDesktop,
+                  i < TESTIMONIALS.length - 1 && isDesktop && { marginRight: 24 },
+                ]}
+              >
+                <Text style={styles.testimonialQuoteMark}>"</Text>
+                <Text style={styles.testimonialQuote}>{t.quote}</Text>
+                <View style={styles.testimonialDivider} />
+                <Text style={[styles.testimonialName, geoWeb]}>{t.name}</Text>
+                <Text style={styles.testimonialDetail}>{t.detail}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* ── SOCIAL ── */}
+        <View style={styles.socialSection}>
+          <Text style={[styles.socialHeading, serifWeb]}>Connect With Us</Text>
+          <Text style={styles.socialSubtitle}>Follow along for tips, stories, and daily inspiration.</Text>
+          <View style={styles.socialRow}>
+            {SOCIALS.map((s) => (
+              <TouchableOpacity
+                key={s.label}
+                style={styles.socialBtn}
+                activeOpacity={0.75}
+                onPress={() => Linking.openURL(s.url)}
+              >
+                <Ionicons name={s.icon} size={26} color={C.copper} />
+                <Text style={styles.socialLabel}>{s.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <Text style={styles.footerCopy}>© 2025 BuiltOnIntimacy.com · All rights reserved</Text>
+        </View>
       </Animated.ScrollView>
+
+      {/* ── FEATURE DETAIL MODAL ── */}
+      <Modal
+        visible={!!activeFeature}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setActiveFeature(null)}
+      >
+        {activeFeature && (
+          <View style={styles.featureModal}>
+            <TouchableOpacity
+              style={styles.featureModalClose}
+              onPress={() => setActiveFeature(null)}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+              <Ionicons name="close" size={28} color={C.white} />
+            </TouchableOpacity>
+            <View style={styles.featureModalContent}>
+              <View style={styles.featureModalIcon}>
+                <Ionicons name={activeFeature.icon} size={52} color={C.copper} />
+              </View>
+              <Text style={[styles.featureModalTitle, serifWeb]}>{activeFeature.title}</Text>
+              <View style={styles.featureModalDivider} />
+              <Text style={styles.featureModalDetail}>{activeFeature.detail}</Text>
+              <TouchableOpacity
+                style={[styles.connectBtn, { alignSelf: 'center', marginTop: 40 }]}
+                activeOpacity={0.85}
+                onPress={() => { setActiveFeature(null); openForm(); }}
+              >
+                <Text style={styles.connectBtnText}>Book a Call</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      </Modal>
 
       {/* ── MOBILE NAV MENU ── */}
       <Modal
@@ -272,7 +421,7 @@ export default function App() {
               activeOpacity={0.7}
               onPress={() => setMenuOpen(false)}
             >
-              <Text style={[styles.mobileMenuLinkText, isWeb && { fontFamily: 'Georgia, serif' }]}>{item}</Text>
+              <Text style={[styles.mobileMenuLinkText, geoWeb]}>{item}</Text>
               <Ionicons name="chevron-forward" size={18} color={C.copper} />
             </TouchableOpacity>
           ))}
@@ -297,14 +446,9 @@ export default function App() {
           style={{ flex: 1, backgroundColor: C.bg }}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-          <ScrollView
-            contentContainerStyle={styles.formScroll}
-            keyboardShouldPersistTaps="handled"
-          >
+          <ScrollView contentContainerStyle={styles.formScroll} keyboardShouldPersistTaps="handled">
             <View style={styles.formHeader}>
-              <Text style={[styles.formTitle, isWeb && { fontFamily: '"Playfair Display", Georgia, serif' }]}>
-                Get in Touch
-              </Text>
+              <Text style={[styles.formTitle, serifWeb]}>Get in Touch</Text>
               <TouchableOpacity onPress={() => setFormOpen(false)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
                 <Ionicons name="close" size={28} color={C.white} />
               </TouchableOpacity>
@@ -313,9 +457,7 @@ export default function App() {
             {submitted ? (
               <View style={styles.formSuccess}>
                 <Ionicons name="checkmark-circle" size={72} color={C.copper} />
-                <Text style={[styles.formSuccessTitle, isWeb && { fontFamily: '"Playfair Display", Georgia, serif' }]}>
-                  Thank you!
-                </Text>
+                <Text style={[styles.formSuccessTitle, serifWeb]}>Thank you!</Text>
                 <Text style={styles.formSuccessBody}>
                   We'll review your message and be in touch soon.
                 </Text>
@@ -328,7 +470,6 @@ export default function App() {
                 <Text style={styles.formSubtitle}>
                   Leave your details and we'll reach out to schedule your complimentary discovery call.
                 </Text>
-
                 <Text style={styles.formLabel}>Your Name *</Text>
                 <TextInput
                   style={styles.formInput}
@@ -338,7 +479,6 @@ export default function App() {
                   onChangeText={setName}
                   returnKeyType="next"
                 />
-
                 <Text style={styles.formLabel}>Phone or Email *</Text>
                 <TextInput
                   style={styles.formInput}
@@ -350,7 +490,6 @@ export default function App() {
                   autoCapitalize="none"
                   returnKeyType="next"
                 />
-
                 <Text style={styles.formLabel}>Message (optional)</Text>
                 <TextInput
                   style={[styles.formInput, styles.formTextArea]}
@@ -362,9 +501,12 @@ export default function App() {
                   numberOfLines={4}
                   textAlignVertical="top"
                 />
-
                 <TouchableOpacity
-                  style={[styles.connectBtn, styles.formSubmitBtn, (!name.trim() || !contact.trim()) && styles.formSubmitDisabled]}
+                  style={[
+                    styles.connectBtn,
+                    styles.formSubmitBtn,
+                    (!name.trim() || !contact.trim()) && styles.formSubmitDisabled,
+                  ]}
                   activeOpacity={0.85}
                   onPress={handleSubmit}
                 >
@@ -392,25 +534,10 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     backgroundColor: C.bg,
   },
-  navDesktop: {
-    paddingHorizontal: 60,
-    paddingVertical: 22,
-  },
-  logo: {
-    color: C.white,
-    fontSize: 17,
-    fontWeight: '600',
-    letterSpacing: 0.3,
-  },
-  logoWeb: {
-    fontFamily: 'Georgia, serif',
-    fontSize: 20,
-  },
-  navLinks: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 36,
-  },
+  navDesktop: { paddingHorizontal: 60, paddingVertical: 22 },
+  logo: { color: C.white, fontSize: 17, fontWeight: '600', letterSpacing: 0.3 },
+  logoWeb: { fontFamily: 'Georgia, serif', fontSize: 20 },
+  navLinks: { flexDirection: 'row', alignItems: 'center', gap: 36 },
   navLinkText: { color: C.white, fontSize: 15, opacity: 0.9 },
   navLinkTextSm: { fontSize: 13 },
   bookBtn: {
@@ -421,33 +548,17 @@ const styles = StyleSheet.create({
   },
   bookBtnText: { color: '#1a0606', fontSize: 15, fontWeight: '600' },
   hamburger: { padding: 4, gap: 5 },
-  hamburgerLine: {
-    width: 24,
-    height: 2,
-    backgroundColor: C.white,
-    borderRadius: 2,
-    marginVertical: 2,
-  },
+  hamburgerLine: { width: 24, height: 2, backgroundColor: C.white, borderRadius: 2, marginVertical: 2 },
 
-  /* ── HERO shared ── */
+  /* ── HERO ── */
   hero: { overflow: 'hidden', backgroundColor: C.bg },
   heroDesktop: { minHeight: 600 },
   heroMobile: { minHeight: 580 },
   heroBg: { position: 'absolute', top: 0, left: 0, right: 0, width: '100%' },
   heroBgDesktop: { height: 760 },
   heroBgMobile: { height: 700 },
-
-  /* ── HERO desktop ── */
-  heroRowDesktop: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    minHeight: 600,
-  },
-  heroOverlay: {
-    paddingHorizontal: 28,
-    paddingVertical: 60,
-    justifyContent: 'center',
-  },
+  heroRowDesktop: { flexDirection: 'row', alignItems: 'flex-end', minHeight: 600 },
+  heroOverlay: { paddingHorizontal: 28, paddingVertical: 60, justifyContent: 'center' },
   heroOverlayDesktop: {
     flex: 1,
     maxWidth: 580,
@@ -464,13 +575,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
-
-  /* ── HERO mobile ── */
   heroColMobile: { flex: 1, minHeight: 580 },
-  heroCoupleWrapMobile: {
-    height: 360,
-    overflow: 'hidden',
-  },
+  heroCoupleWrapMobile: { height: 360, overflow: 'hidden' },
   coupleImgMobile: { width: '100%', height: 360 },
   heroTextMobile: {
     backgroundColor: 'rgba(0,0,0,0.55)',
@@ -478,36 +584,12 @@ const styles = StyleSheet.create({
     paddingTop: 28,
     paddingBottom: 48,
   },
-  heroBodyMobile: {
-    color: C.muted,
-    fontSize: 15,
-    lineHeight: 24,
-    marginBottom: 32,
-  },
-
-  /* ── HERO text (shared) ── */
-  heroHeading: {
-    color: C.white,
-    fontSize: 34,
-    fontWeight: '700',
-    lineHeight: 44,
-    marginBottom: 10,
-  },
+  heroBodyMobile: { color: C.muted, fontSize: 15, lineHeight: 24, marginBottom: 32 },
+  heroHeading: { color: C.white, fontSize: 34, fontWeight: '700', lineHeight: 44, marginBottom: 10 },
   heroHeadingDesktop: { fontSize: 54, lineHeight: 64, marginBottom: 12 },
-  heroScript: {
-    color: C.copper,
-    fontSize: 36,
-    fontStyle: 'italic',
-    marginBottom: 22,
-    lineHeight: 46,
-  },
+  heroScript: { color: C.copper, fontSize: 36, fontStyle: 'italic', marginBottom: 22, lineHeight: 46 },
   heroScriptDesktop: { fontSize: 52, lineHeight: 60, marginBottom: 28 },
-  heroBody: {
-    color: C.muted,
-    fontSize: 16,
-    lineHeight: 28,
-    marginBottom: 40,
-  },
+  heroBody: { color: C.muted, fontSize: 16, lineHeight: 28, marginBottom: 40 },
   connectBtn: {
     backgroundColor: C.blush,
     alignSelf: 'flex-start',
@@ -517,7 +599,7 @@ const styles = StyleSheet.create({
   },
   connectBtnText: { color: '#1a0606', fontSize: 16, fontWeight: '600' },
 
-  /* ── FEATURES desktop ── */
+  /* ── FEATURES ── */
   featuresDesktop: {
     flexDirection: 'row',
     backgroundColor: C.maroon,
@@ -527,58 +609,94 @@ const styles = StyleSheet.create({
   },
   featureRowDesktop: { flex: 1, flexDirection: 'row' },
   featureItemDesktop: { flex: 1, alignItems: 'center', paddingHorizontal: 32 },
-  featureDivider: {
-    width: 1,
-    backgroundColor: C.divider,
-    alignSelf: 'stretch',
-  },
-
-  /* ── FEATURES mobile ── */
-  featuresMobile: {
-    backgroundColor: C.maroon,
-    paddingVertical: 40,
-    paddingHorizontal: 0,
-  },
+  featureDivider: { width: 1, backgroundColor: C.divider, alignSelf: 'stretch' },
+  featuresMobile: { backgroundColor: C.maroon, paddingVertical: 40, paddingHorizontal: 0 },
   featureGridRow: { flexDirection: 'row' },
-  featureGridCell: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 32,
-    paddingHorizontal: 16,
-  },
-  featureGridCellBorder: {
-    borderRightWidth: 1,
-    borderRightColor: C.divider,
-  },
-  featureGridDividerH: {
-    height: 1,
-    backgroundColor: C.divider,
-    marginHorizontal: 24,
-  },
-
-  /* ── FEATURES shared ── */
-  featureTitle: {
-    color: C.white,
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: 14,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
+  featureGridCell: { flex: 1, alignItems: 'center', paddingVertical: 32, paddingHorizontal: 16 },
+  featureGridCellBorder: { borderRightWidth: 1, borderRightColor: C.divider },
+  featureGridDividerH: { height: 1, backgroundColor: C.divider, marginHorizontal: 24 },
+  featureTouchable: { alignItems: 'center' },
+  featureTitle: { color: C.white, fontSize: 18, fontWeight: '600', marginTop: 14, marginBottom: 8, textAlign: 'center' },
   featureTitleMobile: { fontSize: 16 },
-  featureDesc: {
-    color: '#d4b4a8',
-    fontSize: 13,
-    textAlign: 'center',
-    lineHeight: 20,
-    maxWidth: 160,
+  featureDesc: { color: '#d4b4a8', fontSize: 13, textAlign: 'center', lineHeight: 20, maxWidth: 160 },
+  featureTapHint: { color: C.copper, fontSize: 13, marginTop: 12, opacity: 0.85 },
+  featureTapHintMobile: { color: C.copper, fontSize: 12, marginTop: 8, opacity: 0.85 },
+
+  /* ── FEATURE MODAL ── */
+  featureModal: { flex: 1, backgroundColor: C.bg, justifyContent: 'center' },
+  featureModalClose: { position: 'absolute', top: 52, right: 28, zIndex: 10 },
+  featureModalContent: { paddingHorizontal: 36, paddingVertical: 60, alignItems: 'center' },
+  featureModalIcon: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: C.maroon,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
   },
+  featureModalTitle: { color: C.white, fontSize: 32, fontWeight: '700', textAlign: 'center', marginBottom: 20 },
+  featureModalDivider: { width: 48, height: 2, backgroundColor: C.copper, marginBottom: 24 },
+  featureModalDetail: { color: C.muted, fontSize: 16, lineHeight: 28, textAlign: 'center', maxWidth: 500 },
+
+  /* ── TESTIMONIALS ── */
+  testimonialsSection: {
+    backgroundColor: C.bg,
+    paddingVertical: 72,
+    paddingHorizontal: 28,
+    alignItems: 'center',
+  },
+  testimonialsSectionDesktop: { paddingHorizontal: 60 },
+  sectionLabel: {
+    color: C.copper,
+    fontSize: 13,
+    fontWeight: '600',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  sectionHeading: {
+    color: C.white,
+    fontSize: 34,
+    fontWeight: '700',
+    lineHeight: 44,
+    textAlign: 'center',
+    marginBottom: 48,
+  },
+  testimonialsRow: { width: '100%' },
+  testimonialsRowDesktop: { flexDirection: 'row', justifyContent: 'center' },
+  testimonialCard: {
+    backgroundColor: '#100505',
+    borderWidth: 1,
+    borderColor: C.divider,
+    borderRadius: 16,
+    padding: 32,
+    marginBottom: 20,
+  },
+  testimonialCardDesktop: { flex: 1, maxWidth: 380, marginBottom: 0 },
+  testimonialQuoteMark: { color: C.copper, fontSize: 56, lineHeight: 56, marginBottom: 8, fontFamily: 'Georgia, serif' },
+  testimonialQuote: { color: C.white, fontSize: 15, lineHeight: 26, marginBottom: 24, fontStyle: 'italic' },
+  testimonialDivider: { width: 32, height: 1, backgroundColor: C.divider, marginBottom: 16 },
+  testimonialName: { color: C.blush, fontSize: 15, fontWeight: '600', marginBottom: 4 },
+  testimonialDetail: { color: C.muted, fontSize: 13 },
+
+  /* ── SOCIAL / FOOTER ── */
+  socialSection: {
+    backgroundColor: C.maroon,
+    paddingVertical: 60,
+    paddingHorizontal: 28,
+    alignItems: 'center',
+  },
+  socialHeading: { color: C.white, fontSize: 26, fontWeight: '700', textAlign: 'center', marginBottom: 10 },
+  socialSubtitle: { color: C.muted, fontSize: 15, textAlign: 'center', marginBottom: 36 },
+  socialRow: { flexDirection: 'row', gap: 20, marginBottom: 48 },
+  socialBtn: { alignItems: 'center', gap: 8 },
+  socialLabel: { color: C.muted, fontSize: 12 },
+  footerCopy: { color: '#6b3030', fontSize: 12, textAlign: 'center' },
 
   /* ── MOBILE NAV MENU ── */
-  mobileMenu: {
-    flex: 1,
-    backgroundColor: C.bg,
-  },
+  mobileMenu: { flex: 1, backgroundColor: C.bg },
   mobileMenuHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -597,12 +715,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: C.divider,
   },
-  mobileMenuLinkText: {
-    color: C.white,
-    fontSize: 20,
-    fontWeight: '400',
-    letterSpacing: 0.3,
-  },
+  mobileMenuLinkText: { color: C.white, fontSize: 20, fontWeight: '400', letterSpacing: 0.3 },
   mobileMenuBookBtn: {
     backgroundColor: C.blush,
     alignSelf: 'center',
@@ -613,36 +726,11 @@ const styles = StyleSheet.create({
   },
 
   /* ── CONTACT FORM ── */
-  formScroll: {
-    flexGrow: 1,
-    paddingHorizontal: 28,
-    paddingTop: 24,
-    paddingBottom: 48,
-  },
-  formHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  formTitle: {
-    color: C.white,
-    fontSize: 26,
-    fontWeight: '700',
-  },
-  formSubtitle: {
-    color: C.muted,
-    fontSize: 15,
-    lineHeight: 24,
-    marginBottom: 32,
-  },
-  formLabel: {
-    color: C.blush,
-    fontSize: 13,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-    marginBottom: 8,
-  },
+  formScroll: { flexGrow: 1, paddingHorizontal: 28, paddingTop: 24, paddingBottom: 48 },
+  formHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  formTitle: { color: C.white, fontSize: 26, fontWeight: '700' },
+  formSubtitle: { color: C.muted, fontSize: 15, lineHeight: 24, marginBottom: 32 },
+  formLabel: { color: C.blush, fontSize: 13, fontWeight: '600', letterSpacing: 0.5, marginBottom: 8 },
   formInput: {
     backgroundColor: '#150505',
     borderWidth: 1,
@@ -654,34 +742,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginBottom: 22,
   },
-  formTextArea: {
-    height: 120,
-  },
-  formSubmitBtn: {
-    alignSelf: 'stretch',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  formSubmitDisabled: {
-    opacity: 0.45,
-  },
-  formSuccess: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 80,
-    gap: 20,
-  },
-  formSuccessTitle: {
-    color: C.white,
-    fontSize: 32,
-    fontWeight: '700',
-  },
-  formSuccessBody: {
-    color: C.muted,
-    fontSize: 16,
-    textAlign: 'center',
-    lineHeight: 26,
-    marginBottom: 12,
-  },
+  formTextArea: { height: 120 },
+  formSubmitBtn: { alignSelf: 'stretch', alignItems: 'center', marginTop: 8 },
+  formSubmitDisabled: { opacity: 0.45 },
+  formSuccess: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 80, gap: 20 },
+  formSuccessTitle: { color: C.white, fontSize: 32, fontWeight: '700' },
+  formSuccessBody: { color: C.muted, fontSize: 16, textAlign: 'center', lineHeight: 26, marginBottom: 12 },
 });
