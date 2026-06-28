@@ -221,13 +221,21 @@ export default function App() {
               <TouchableOpacity style={styles.bookBtn} activeOpacity={0.85} onPress={openForm}>
                 <Text style={styles.bookBtnText}>Book a Call</Text>
               </TouchableOpacity>
+              <TouchableOpacity style={styles.profileBtn} activeOpacity={0.7}>
+                <Ionicons name="person-circle-outline" size={34} color={C.white} />
+              </TouchableOpacity>
             </View>
           ) : (
-            <TouchableOpacity style={styles.hamburger} activeOpacity={0.7} onPress={() => setMenuOpen(true)}>
-              <View style={styles.hamburgerLine} />
-              <View style={styles.hamburgerLine} />
-              <View style={styles.hamburgerLine} />
-            </TouchableOpacity>
+            <View style={styles.navRight}>
+              <TouchableOpacity style={styles.profileBtn} activeOpacity={0.7}>
+                <Ionicons name="person-circle-outline" size={32} color={C.white} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.hamburger} activeOpacity={0.7} onPress={() => setMenuOpen(true)}>
+                <View style={styles.hamburgerLine} />
+                <View style={styles.hamburgerLine} />
+                <View style={styles.hamburgerLine} />
+              </TouchableOpacity>
+            </View>
           )}
         </View>
 
@@ -639,6 +647,8 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   bookBtnText: { color: '#1a0606', fontSize: 15, fontWeight: '600' },
+  navRight: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  profileBtn: { padding: 2 },
   hamburger: { padding: 4, gap: 5 },
   hamburgerLine: { width: 24, height: 2, backgroundColor: C.white, borderRadius: 2, marginVertical: 2 },
 
