@@ -404,6 +404,7 @@ export default function App() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.benefitsScroll}
+            style={styles.benefitsScrollView}
           >
             {BENEFITS.map((b) => (
               <View key={b.title} style={styles.benefitCard}>
@@ -412,12 +413,12 @@ export default function App() {
                 </View>
                 <Text style={[styles.benefitTitle, geoWeb]}>{b.title}</Text>
                 <Text style={styles.benefitDesc}>{b.desc}</Text>
-                <TouchableOpacity style={styles.benefitBtn} activeOpacity={0.85} onPress={openForm}>
-                  <Text style={styles.benefitBtnText}>Get Started</Text>
-                </TouchableOpacity>
               </View>
             ))}
           </ScrollView>
+          <TouchableOpacity style={[styles.connectBtn, { marginTop: 40 }]} activeOpacity={0.85} onPress={openForm}>
+            <Text style={styles.connectBtnText}>Get Started</Text>
+          </TouchableOpacity>
         </View>
 
         {/* ── TESTIMONIALS ── */}
@@ -910,6 +911,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   benefitsSectionDesktop: { paddingVertical: 72 },
+  benefitsScrollView: { alignSelf: 'stretch' },
   benefitsScroll: {
     paddingHorizontal: 28,
     gap: 16,
@@ -944,17 +946,7 @@ const styles = StyleSheet.create({
     color: C.muted,
     fontSize: 13,
     lineHeight: 20,
-    marginBottom: 20,
-    flex: 1,
   },
-  benefitBtn: {
-    backgroundColor: C.blush,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 50,
-    alignSelf: 'flex-start',
-  },
-  benefitBtnText: { color: '#1a0606', fontSize: 13, fontWeight: '600' },
 
   /* ── CONTACT FORM ── */
   formScroll: { flexGrow: 1, paddingHorizontal: 28, paddingTop: 24, paddingBottom: 48 },
