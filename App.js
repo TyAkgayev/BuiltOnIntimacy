@@ -150,7 +150,7 @@ export default function App() {
               <Animated.Image
                 source={require('./assets/couple.png')}
                 style={[styles.coupleImgMobile, { transform: [{ translateY: coupleTranslate }] }]}
-                resizeMode="contain"
+                resizeMode="cover"
               />
             </View>
             {/* Text block below */}
@@ -315,11 +315,10 @@ const styles = StyleSheet.create({
   /* ── HERO mobile ── */
   heroColMobile: { flex: 1, minHeight: 580 },
   heroCoupleWrapMobile: {
-    alignItems: 'flex-end',
-    paddingRight: 0,
-    height: 300,
+    height: 360,
+    overflow: 'hidden',
   },
-  coupleImgMobile: { width: '75%', height: 300 },
+  coupleImgMobile: { width: '100%', height: 360 },
   heroTextMobile: {
     backgroundColor: 'rgba(0,0,0,0.55)',
     paddingHorizontal: 28,
