@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
   Animated,
@@ -97,6 +97,15 @@ const SOCIALS = [
   { icon: 'logo-tiktok', label: 'TikTok', url: 'https://tiktok.com/@builtonintimacy' },
 ];
 
+const BENEFITS = [
+  { icon: 'person-outline',       title: '1-on-1 Personalized Coaching', desc: 'Every session is tailored to your unique relationship dynamic — no generic advice, ever.' },
+  { icon: 'bulb-outline',         title: 'Proven Frameworks',            desc: 'Evidence-based tools that create lasting change, not just temporary fixes.' },
+  { icon: 'calendar-outline',     title: 'Flexible Scheduling',          desc: 'Available mornings, evenings, and weekends — sessions designed to fit your life.' },
+  { icon: 'lock-closed-outline',  title: 'Private & Confidential',       desc: 'Everything shared stays between you and your coach. A safe space, always.' },
+  { icon: 'trending-up-outline',  title: 'Measurable Progress',          desc: 'Clear milestones so you can see and feel the growth happening in real time.' },
+  { icon: 'infinite-outline',     title: 'Ongoing Support',              desc: 'Resources and check-ins between sessions to keep your momentum going.' },
+];
+
 export default function App() {
   const isWeb = Platform.OS === 'web';
   const { width } = useWindowDimensions();
@@ -108,6 +117,8 @@ export default function App() {
 
   const scrollY = useRef(new Animated.Value(0)).current;
   const featureScales = useRef(FEATURES.map(() => new Animated.Value(1))).current;
+  const videoContainerRef = useRef(null);
+  const videoProgress = useRef(new Animated.Value(0)).current;
 
   const [menuOpen, setMenuOpen]       = useState(false);
   const [formOpen, setFormOpen]       = useState(false);
@@ -116,6 +127,30 @@ export default function App() {
   const [contact, setContact]         = useState('');
   const [message, setMessage]         = useState('');
   const [activeFeature, setActiveFeature] = useState(null);
+  const [videoPlaying, setVideoPlaying]   = useState(false);
+
+  const videoW = isDesktop ? Math.min(width - 120, 960) : width - 56;
+  const videoH = Math.round(videoW * 9 / 16);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    const timer = setTimeout(() => {
+      const node = videoContainerRef.current;
+      if (!node) return;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setVideoPlaying(true);
+            Animated.timing(videoProgress, { toValue: 1, duration: 5000, useNativeDriver: false }).start();
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.4 }
+      );
+      observer.observe(node);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   const openForm = () => {
     setSubmitted(false);
@@ -127,7 +162,7 @@ export default function App() {
 
   const handleSubmit = () => {
     if (!name.trim() || !contact.trim()) return;
-    const subject = encodeURIComponent('New Inquiry — BuiltOnIntimacy.com');
+    const subject = encodeURIComponent('New Inquiry — BuiltOnIntimacy');
     const body = encodeURIComponent(
       `Name: ${name}\nContact: ${contact}${message ? `\n\nMessage:\n${message}` : ''}`
     );
@@ -175,7 +210,7 @@ export default function App() {
 
         {/* ── NAV ── */}
         <View style={[styles.nav, isDesktop && styles.navDesktop]}>
-          <Text style={[styles.logo, isWeb && styles.logoWeb]}>BuiltOnIntimacy.com</Text>
+          <Text style={[styles.logo, isWeb && styles.logoWeb]}>BuiltOnIntimacy</Text>
           {isDesktop ? (
             <View style={[styles.navLinks, { gap: width >= 1200 ? 36 : 18 }]}>
               {NAV_LINKS.map((item) => (
@@ -222,7 +257,7 @@ export default function App() {
                   relationship that feels safe,{'\n'}passionate, and unshakable.
                 </Text>
                 <TouchableOpacity style={styles.connectBtn} activeOpacity={0.85} onPress={openForm}>
-                  <Text style={styles.connectBtnText}>Let's Connect</Text>
+                  <Text style={styles.connectBtnText}>Schedule Sessions 24/7</Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.heroRightDesktop}>
@@ -252,7 +287,7 @@ export default function App() {
                   relationship that feels safe, passionate, and unshakable.
                 </Text>
                 <TouchableOpacity style={styles.connectBtn} activeOpacity={0.85} onPress={openForm}>
-                  <Text style={styles.connectBtnText}>Let's Connect</Text>
+                  <Text style={styles.connectBtnText}>Schedule Sessions 24/7</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -319,6 +354,63 @@ export default function App() {
             </View>
           </View>
         )}
+
+        {/* ── VIDEO SECTION ── */}
+        <View style={[styles.videoSection, isDesktop && styles.videoSectionDesktop]}>
+          <Text style={styles.sectionLabel}>Featured</Text>
+          <Text style={[styles.videoHeading, serifWeb]}>
+            From Desire To Intimacy.{'\n'}How to Keep It Alive
+          </Text>
+          <Text style={styles.videoAuthor}>
+            Fateemah Jobe, Relationship Expert and Sexuality Coach
+          </Text>
+          <View ref={videoContainerRef} style={[styles.videoPlayer, { width: videoW, height: videoH }]}>
+            {/* Dark thumbnail area */}
+            <View style={styles.videoThumbnail} />
+            {/* Play / pause overlay */}
+            <Animated.View style={[styles.videoOverlay, { opacity: videoPlaying ? videoProgress.interpolate({ inputRange: [0, 0.15], outputRange: [1, 0], extrapolate: 'clamp' }) : 1 }]}>
+              <View style={styles.playBtnCircle}>
+                <Ionicons name={videoPlaying ? 'pause' : 'play'} size={34} color={C.bg} style={{ marginLeft: videoPlaying ? 0 : 3 }} />
+              </View>
+            </Animated.View>
+            {/* Bottom control bar */}
+            <View style={styles.videoBar}>
+              <Ionicons name={videoPlaying ? 'pause' : 'play'} size={18} color={C.white} />
+              <View style={styles.videoProgressTrack}>
+                <Animated.View style={[styles.videoProgressFill, {
+                  width: videoProgress.interpolate({ inputRange: [0, 1], outputRange: ['0%', '35%'] }),
+                }]} />
+              </View>
+              <Text style={styles.videoTime}>
+                {videoPlaying ? '0:18' : '0:00'} / 12:34
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* ── BENEFITS ── */}
+        <View style={[styles.benefitsSection, isDesktop && styles.benefitsSectionDesktop]}>
+          <Text style={styles.sectionLabel}>Why Us</Text>
+          <Text style={[styles.sectionHeading, serifWeb]}>Our Benefits</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.benefitsScroll}
+          >
+            {BENEFITS.map((b) => (
+              <View key={b.title} style={styles.benefitCard}>
+                <View style={styles.benefitIconWrap}>
+                  <Ionicons name={b.icon} size={28} color={C.copper} />
+                </View>
+                <Text style={[styles.benefitTitle, geoWeb]}>{b.title}</Text>
+                <Text style={styles.benefitDesc}>{b.desc}</Text>
+                <TouchableOpacity style={styles.benefitBtn} activeOpacity={0.85} onPress={openForm}>
+                  <Text style={styles.benefitBtnText}>Get Started</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
 
         {/* ── TESTIMONIALS ── */}
         <View style={[styles.testimonialsSection, isDesktop && styles.testimonialsSectionDesktop]}>
@@ -409,7 +501,7 @@ export default function App() {
       >
         <View style={styles.mobileMenu}>
           <View style={styles.mobileMenuHeader}>
-            <Text style={[styles.logo, isWeb && styles.logoWeb]}>BuiltOnIntimacy.com</Text>
+            <Text style={[styles.logo, isWeb && styles.logoWeb]}>BuiltOnIntimacy</Text>
             <TouchableOpacity onPress={() => setMenuOpen(false)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
               <Ionicons name="close" size={28} color={C.white} />
             </TouchableOpacity>
@@ -724,6 +816,135 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginTop: 48,
   },
+
+  /* ── VIDEO SECTION ── */
+  videoSection: {
+    backgroundColor: '#050505',
+    paddingVertical: 72,
+    paddingHorizontal: 28,
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: C.divider,
+  },
+  videoSectionDesktop: { paddingHorizontal: 60 },
+  videoHeading: {
+    color: C.white,
+    fontSize: 30,
+    fontWeight: '700',
+    textAlign: 'center',
+    lineHeight: 42,
+    marginBottom: 10,
+  },
+  videoAuthor: {
+    color: C.copper,
+    fontSize: 14,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginBottom: 36,
+    letterSpacing: 0.3,
+  },
+  videoPlayer: {
+    borderRadius: 14,
+    overflow: 'hidden',
+    backgroundColor: '#0d0d0d',
+    borderWidth: 1,
+    borderColor: C.divider,
+  },
+  videoThumbnail: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#0d0d0d',
+  },
+  videoOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playBtnCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: 'rgba(201,136,104,0.92)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  videoBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 44,
+    backgroundColor: 'rgba(0,0,0,0.75)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    gap: 10,
+  },
+  videoProgressTrack: {
+    flex: 1,
+    height: 3,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 2,
+  },
+  videoProgressFill: {
+    height: 3,
+    backgroundColor: C.copper,
+    borderRadius: 2,
+  },
+  videoTime: { color: 'rgba(255,255,255,0.7)', fontSize: 11 },
+
+  /* ── BENEFITS ── */
+  benefitsSection: {
+    backgroundColor: C.maroon,
+    paddingVertical: 64,
+    paddingHorizontal: 0,
+    alignItems: 'center',
+  },
+  benefitsSectionDesktop: { paddingVertical: 72 },
+  benefitsScroll: {
+    paddingHorizontal: 28,
+    gap: 16,
+    paddingBottom: 8,
+  },
+  benefitCard: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: C.divider,
+    borderRadius: 14,
+    padding: 24,
+    width: 240,
+    alignItems: 'flex-start',
+  },
+  benefitIconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: 'rgba(201,136,104,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  benefitTitle: {
+    color: C.white,
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+    lineHeight: 22,
+  },
+  benefitDesc: {
+    color: C.muted,
+    fontSize: 13,
+    lineHeight: 20,
+    marginBottom: 20,
+    flex: 1,
+  },
+  benefitBtn: {
+    backgroundColor: C.blush,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 50,
+    alignSelf: 'flex-start',
+  },
+  benefitBtnText: { color: '#1a0606', fontSize: 13, fontWeight: '600' },
 
   /* ── CONTACT FORM ── */
   formScroll: { flexGrow: 1, paddingHorizontal: 28, paddingTop: 24, paddingBottom: 48 },
