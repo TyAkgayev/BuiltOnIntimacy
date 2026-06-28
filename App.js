@@ -216,15 +216,10 @@ export default function App() {
 
   return (
     <>
-      <Animated.ScrollView
-        style={styles.root}
-        contentContainerStyle={styles.rootContent}
-        onScroll={onScroll}
-        scrollEventThrottle={16}
-      >
+      <View style={styles.rootWrap}>
         <StatusBar style="light" />
 
-        {/* ── NAV ── */}
+        {/* ── NAV (sticky) ── */}
         <View style={[styles.nav, isDesktop && styles.navDesktop]}>
           <Text style={[styles.logo, isWeb && styles.logoWeb]}>BuiltOnIntimacy</Text>
           {isDesktop ? (
@@ -234,6 +229,9 @@ export default function App() {
                   <Text style={[styles.navLinkText, width < 1100 && styles.navLinkTextSm]}>{item}</Text>
                 </TouchableOpacity>
               ))}
+              <TouchableOpacity style={styles.navGetStartedBtn} activeOpacity={0.85} onPress={openForm}>
+                <Text style={styles.navGetStartedText}>Get Started</Text>
+              </TouchableOpacity>
               <TouchableOpacity style={styles.bookBtn} activeOpacity={0.85} onPress={openForm}>
                 <Text style={styles.bookBtnText}>Book a Call</Text>
               </TouchableOpacity>
@@ -243,6 +241,9 @@ export default function App() {
             </View>
           ) : (
             <View style={styles.navRight}>
+              <TouchableOpacity style={styles.navGetStartedBtn} activeOpacity={0.85} onPress={openForm}>
+                <Text style={styles.navGetStartedText}>Get Started</Text>
+              </TouchableOpacity>
               <TouchableOpacity style={styles.profileBtn} activeOpacity={0.7}>
                 <Ionicons name="person-circle-outline" size={32} color={C.white} />
               </TouchableOpacity>
@@ -254,6 +255,13 @@ export default function App() {
             </View>
           )}
         </View>
+
+        <Animated.ScrollView
+          style={styles.root}
+          contentContainerStyle={styles.rootContent}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+        >
 
         {/* ── HERO ── */}
         <View style={[styles.hero, isDesktop ? styles.heroDesktop : styles.heroMobile]}>
@@ -488,6 +496,7 @@ export default function App() {
           <Text style={styles.footerCopy}>© 2025 BuiltOnIntimacy.com · All rights reserved</Text>
         </View>
       </Animated.ScrollView>
+      </View>
 
       {/* ── FEATURE DETAIL MODAL ── */}
       <Modal
@@ -646,6 +655,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  rootWrap: { flex: 1, backgroundColor: C.bg },
   root: { flex: 1, backgroundColor: C.bg },
   rootContent: { flexGrow: 1 },
 
@@ -671,8 +681,16 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   bookBtnText: { color: '#1a0606', fontSize: 15, fontWeight: '600' },
-  navRight: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  navRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   profileBtn: { padding: 2 },
+  navGetStartedBtn: {
+    borderWidth: 1,
+    borderColor: C.copper,
+    paddingVertical: 7,
+    paddingHorizontal: 16,
+    borderRadius: 50,
+  },
+  navGetStartedText: { color: C.copper, fontSize: 13, fontWeight: '600' },
   hamburger: { padding: 4, gap: 5 },
   hamburgerLine: { width: 24, height: 2, backgroundColor: C.white, borderRadius: 2, marginVertical: 2 },
 
