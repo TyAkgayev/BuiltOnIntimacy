@@ -405,6 +405,9 @@ export default function App() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.benefitsScroll}
             style={styles.benefitsScrollView}
+            snapToInterval={256}
+            snapToAlignment="start"
+            decelerationRate="fast"
           >
             {BENEFITS.map((b) => (
               <View key={b.title} style={styles.benefitCard}>
@@ -416,7 +419,7 @@ export default function App() {
               </View>
             ))}
           </ScrollView>
-          <TouchableOpacity style={[styles.connectBtn, { marginTop: 40 }]} activeOpacity={0.85} onPress={openForm}>
+          <TouchableOpacity style={[styles.connectBtn, { marginTop: 40, alignSelf: 'center' }]} activeOpacity={0.85} onPress={openForm}>
             <Text style={styles.connectBtnText}>Get Started</Text>
           </TouchableOpacity>
         </View>
