@@ -284,6 +284,7 @@ export default function App() {
       drag.startX = e.pageX;
       drag.scrollLeft = node.scrollLeft;
       node.style.cursor = 'grabbing';
+      node.style.scrollSnapType = 'none';
       e.stopPropagation();
     };
     const onMouseMove = (e) => {
@@ -295,6 +296,7 @@ export default function App() {
       if (!drag.active) return;
       drag.active = false;
       node.style.cursor = 'grab';
+      node.style.scrollSnapType = 'x mandatory';
     };
     node.style.cursor = 'grab';
     node.addEventListener('mousedown', onMouseDown);
@@ -360,7 +362,9 @@ export default function App() {
 
         {/* ── NAV (sticky) ── */}
         <View style={[styles.nav, isDesktop && styles.navDesktop]}>
-          <Text style={[styles.logo, isWeb && styles.logoWeb]}>BuiltOnIntimacy</Text>
+          <TouchableOpacity activeOpacity={0.8} onPress={() => setActivePage(null)}>
+            <Text style={[styles.logo, isWeb && styles.logoWeb]}>BuiltOnIntimacy</Text>
+          </TouchableOpacity>
           {isDesktop ? (
             <View style={[styles.navLinks, { gap: width >= 1200 ? 36 : 18 }]}>
               {NAV_LINKS.map((item) => (
@@ -1027,6 +1031,11 @@ export default function App() {
                 </View>
               </View>
               <View style={styles.pageModBody}>
+                <Image
+                  source={require('./assets/fateemah_jobe.png')}
+                  style={styles.coachPhoto}
+                  resizeMode="cover"
+                />
                 <Text style={styles.pageModPara}>
                   Fateemah Jobe is a certified Relationship Expert and Sexuality Coach dedicated to helping couples move beyond surface-level fixes and into the deeper work — rebuilding trust, reigniting desire, and creating a partnership that truly thrives.
                 </Text>
@@ -1226,6 +1235,7 @@ const styles = StyleSheet.create({
   pageModSubtitle: { color: C.copper, fontSize: 14, fontWeight: '500' },
   pageModBody: { padding: 24, gap: 0 },
   pageModPara: { color: C.muted, fontSize: 15, lineHeight: 24, marginBottom: 20 },
+  coachPhoto: { width: '100%', height: 340, borderRadius: 16, marginBottom: 24 },
   pageModSectionLabel: {
     color: C.copper, fontSize: 11, fontWeight: '700', letterSpacing: 1.4,
     textTransform: 'uppercase', marginTop: 8, marginBottom: 14,
@@ -1263,7 +1273,7 @@ const styles = StyleSheet.create({
   },
   navDesktop: { paddingHorizontal: 60, paddingVertical: 22 },
   logo: { color: C.white, fontSize: 17, fontWeight: '600', letterSpacing: 0.3 },
-  logoWeb: { fontFamily: 'Georgia, serif', fontSize: 20 },
+  logoWeb: { fontFamily: '"Great Vibes", cursive', fontSize: 28, fontWeight: '400', letterSpacing: 0 },
   navLinks: { flexDirection: 'row', alignItems: 'center', gap: 36 },
   navLinkText: { color: C.white, fontSize: 15, opacity: 0.9 },
   navLinkTextSm: { fontSize: 13 },
@@ -1640,9 +1650,9 @@ const styles = StyleSheet.create({
   },
   howSectionDesktop: { paddingHorizontal: 80 },
   howSteps: { width: '100%', gap: 32, marginTop: 16 },
-  howStepsDesktop: { flexDirection: 'row', justifyContent: 'center', gap: 40, width: 'auto' },
-  howStep: { flex: 1, maxWidth: 340 },
-  howStepDesktop: { alignItems: 'flex-start', flex: 0, width: 300 },
+  howStepsDesktop: { flexDirection: 'row', justifyContent: 'center', gap: 40 },
+  howStep: { maxWidth: 340 },
+  howStepDesktop: { alignItems: 'flex-start', flex: 1, maxWidth: 300 },
   howStepNumber: { color: C.copper, fontSize: 40, fontWeight: '700', opacity: 0.5, marginBottom: 8 },
   howStepLine: { width: 40, height: 2, backgroundColor: C.copper, opacity: 0.4, marginBottom: 16 },
   howStepTitle: { color: C.white, fontSize: 18, fontWeight: '700', marginBottom: 10 },
