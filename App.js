@@ -29,7 +29,7 @@ if (Platform.OS === 'web') {
   document.head.appendChild(noSelect);
 
   // Fix transparent favicon — bake a dark background so Chrome tab doesn't show white
-  const faviconImg = new Image();
+  const faviconImg = new window.Image();
   faviconImg.onload = () => {
     const c = document.createElement('canvas');
     c.width = c.height = 64;
