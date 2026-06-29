@@ -37,7 +37,7 @@ const C = {
 
 const CONTACT_EMAIL = 'hello@builtonintimacy.com';
 
-const NAV_LINKS = ['About', 'Coaching', 'Programs', 'Resources', 'Blog'];
+const NAV_LINKS = ['About', 'Coaching', 'Programs', 'Resources'];
 
 const FEATURES = [
   {
@@ -93,7 +93,7 @@ const TESTIMONIALS = [
 
 const SOCIALS = [
   { label: 'Instagram', url: 'https://www.instagram.com/mrsjobe_therelationshipbuilder/', avatar: require('./assets/insta.png') },
-  { label: 'Snapchat',  url: 'https://snapchat.com/t/UIOVLDhF',                          avatar: require('./assets/snap.png') },
+  { label: 'Snapchat',  url: 'https://snapchat.com/t/UlOVLDhF',                          avatar: require('./assets/snap.png') },
   { label: 'TikTok',    url: 'https://tiktok.com/@mrsjobe24_7relations',                  avatar: require('./assets/tiktok.png') },
   { label: 'YouTube',   url: 'https://www.youtube.com/@Mrsjobe',                          avatar: require('./assets/youtube.png') },
 ];
@@ -143,6 +143,7 @@ export default function App() {
   const [videoCurrentTime, setVideoCurrentTime] = useState(0);
   const [videoDuration, setVideoDuration]       = useState(0);
   const [btnIndex, setBtnIndex]           = useState(0);
+  const [activePage, setActivePage]       = useState(null);
   const [authOpen, setAuthOpen]           = useState(false);
   const [authTab, setAuthTab]             = useState('login');
   const [authName, setAuthName]           = useState('');
@@ -151,9 +152,10 @@ export default function App() {
   const [activeBenefitIdx, setActiveBenefitIdx] = useState(0);
 
   const benefitPeek = 44;
-  const benefitGap = 12;
+  const benefitGap = 16;
   const benefitCardW = width - 2 * benefitPeek;
   const benefitSnapInterval = benefitCardW + benefitGap;
+  const benefitPadding = (width - benefitCardW) / 2;
 
   const onBenefitScroll = (e) => {
     const x = e.nativeEvent.contentOffset.x;
@@ -305,7 +307,7 @@ export default function App() {
           {isDesktop ? (
             <View style={[styles.navLinks, { gap: width >= 1200 ? 36 : 18 }]}>
               {NAV_LINKS.map((item) => (
-                <TouchableOpacity key={item} activeOpacity={0.7}>
+                <TouchableOpacity key={item} activeOpacity={0.7} onPress={() => setActivePage(item)}>
                   <Text style={[styles.navLinkText, width < 1100 && styles.navLinkTextSm]}>{item}</Text>
                 </TouchableOpacity>
               ))}
@@ -577,17 +579,21 @@ export default function App() {
             horizontal
             showsHorizontalScrollIndicator={false}
             snapToInterval={benefitSnapInterval}
-            snapToAlignment="start"
+            snapToAlignment="center"
             decelerationRate="fast"
-            contentContainerStyle={styles.benefitsScroll}
+            contentContainerStyle={[styles.benefitsScroll, { paddingHorizontal: benefitPadding }]}
             style={[styles.benefitsScrollView, isWeb && { scrollSnapType: 'x mandatory' }]}
             onScroll={onBenefitScroll}
             scrollEventThrottle={16}
           >
-            {BENEFITS.map((b) => (
+            {BENEFITS.map((b, i) => (
               <View
                 key={b.title}
-                style={[styles.benefitCard, { width: benefitCardW }, isWeb && { scrollSnapAlign: 'start' }]}
+                style={[
+                  styles.benefitCard,
+                  { width: benefitCardW, opacity: i === activeBenefitIdx ? 1 : 0.35 },
+                  isWeb && { scrollSnapAlign: 'center', transition: 'opacity 0.25s' },
+                ]}
               >
                 <View style={styles.benefitIconWrap}>
                   <Ionicons name={b.icon} size={28} color={C.copper} />
@@ -728,7 +734,7 @@ export default function App() {
               key={item}
               style={styles.mobileMenuLink}
               activeOpacity={0.7}
-              onPress={() => setMenuOpen(false)}
+              onPress={() => { setMenuOpen(false); setActivePage(item); }}
             >
               <Text style={[styles.mobileMenuLinkText, geoWeb]}>{item}</Text>
               <Ionicons name="chevron-forward" size={18} color={C.copper} />
@@ -922,11 +928,252 @@ export default function App() {
           </ScrollView>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* ── PAGE MODALS ── */}
+      <Modal visible={activePage !== null} animationType="slide" transparent={false} onRequestClose={() => setActivePage(null)}>
+        <View style={styles.pageMod}>
+          <View style={styles.pageModHeader}>
+            <TouchableOpacity onPress={() => setActivePage(null)} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+              <Ionicons name="arrow-back" size={26} color={C.white} />
+            </TouchableOpacity>
+            <Text style={[styles.pageModTitle, geoWeb]}>{activePage}</Text>
+            <View style={{ width: 26 }} />
+          </View>
+
+          <ScrollView contentContainerStyle={styles.pageModScroll} showsVerticalScrollIndicator={false}>
+
+            {/* ── ABOUT ── */}
+            {activePage === 'About' && <>
+              <View style={styles.pageModHero}>
+                <Image source={require('./assets/couple.png')} style={styles.pageModHeroImg} />
+                <View style={styles.pageModHeroOverlay} />
+                <View style={styles.pageModHeroText}>
+                  <Text style={[styles.pageModH1, serifWeb]}>Meet Fateemah Jobe</Text>
+                  <Text style={styles.pageModSubtitle}>Relationship Expert & Sexuality Coach</Text>
+                </View>
+              </View>
+              <View style={styles.pageModBody}>
+                <Text style={styles.pageModPara}>
+                  Fateemah Jobe is a certified Relationship Expert and Sexuality Coach dedicated to helping couples move beyond surface-level fixes and into the deeper work — rebuilding trust, reigniting desire, and creating a partnership that truly thrives.
+                </Text>
+                <Text style={styles.pageModPara}>
+                  After years of watching couples struggle in silence, she founded BuiltOnIntimacy with one mission: to give every relationship the tools, language, and safe space it needs to flourish. Her approach blends evidence-based communication frameworks with real, compassionate guidance — tailored to your unique dynamic.
+                </Text>
+                <Text style={[styles.pageModSectionLabel, geoWeb]}>Credentials</Text>
+                {[
+                  'Certified Relationship Coach',
+                  'Sexuality & Intimacy Specialist',
+                  'Communication & Conflict Resolution Expert',
+                  'Trauma-Informed Coaching Practice',
+                ].map(c => (
+                  <View key={c} style={styles.pageModBullet}>
+                    <Ionicons name="checkmark-circle" size={18} color={C.copper} />
+                    <Text style={styles.pageModBulletText}>{c}</Text>
+                  </View>
+                ))}
+                <Text style={[styles.pageModSectionLabel, geoWeb]}>Our Mission</Text>
+                <Text style={styles.pageModPara}>
+                  To help couples build relationships rooted in deep trust, honest communication, and unapologetic intimacy — because every love story deserves to be great.
+                </Text>
+                <TouchableOpacity style={[styles.connectBtn, { alignSelf: 'center', marginTop: 8 }]} activeOpacity={0.85} onPress={() => { setActivePage(null); openForm(); }}>
+                  <Text style={styles.connectBtnText}>Book a Discovery Call</Text>
+                </TouchableOpacity>
+              </View>
+            </>}
+
+            {/* ── COACHING ── */}
+            {activePage === 'Coaching' && <>
+              <View style={styles.pageModBody}>
+                <Text style={[styles.pageModH1, serifWeb]}>1-on-1 Coaching</Text>
+                <Text style={styles.pageModPara}>
+                  Every coaching engagement is built entirely around you. No scripts. No generic advice. Just focused, personalized guidance designed to move your relationship forward.
+                </Text>
+                <Text style={[styles.pageModSectionLabel, geoWeb]}>What a Session Looks Like</Text>
+                <Text style={styles.pageModPara}>
+                  Sessions are 50–60 minutes, conducted via secure video call from the privacy of your own home. We open with a check-in, work through your focus area for the week, and close with clear action steps you can implement immediately.
+                </Text>
+                {[
+                  { icon: 'shield-checkmark-outline', title: 'Safe & Confidential', desc: 'Everything shared in session stays in session. Always.' },
+                  { icon: 'calendar-outline',         title: 'Flexible Scheduling', desc: 'Morning, evening, or weekend — sessions fit your life, not the other way around.' },
+                  { icon: 'layers-outline',           title: 'Proven Frameworks',   desc: 'Evidence-based tools that create real, lasting change.' },
+                  { icon: 'trending-up-outline',      title: 'Measurable Growth',   desc: 'Clear milestones so you can see and feel the progress happening.' },
+                ].map(f => (
+                  <View key={f.title} style={styles.pageModFeature}>
+                    <View style={styles.benefitIconWrap}>
+                      <Ionicons name={f.icon} size={24} color={C.copper} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.pageModFeatureTitle}>{f.title}</Text>
+                      <Text style={styles.pageModFeatureDesc}>{f.desc}</Text>
+                    </View>
+                  </View>
+                ))}
+                <Text style={[styles.pageModSectionLabel, geoWeb]}>Is Coaching Right for You?</Text>
+                {[
+                  'You feel emotionally disconnected from your partner',
+                  'Communication has broken down or turned into conflict',
+                  'Intimacy and desire have faded',
+                  'You want to rebuild trust after betrayal',
+                  'You're ready to stop surviving and start thriving',
+                ].map(item => (
+                  <View key={item} style={styles.pageModBullet}>
+                    <Ionicons name="checkmark-circle" size={18} color={C.copper} />
+                    <Text style={styles.pageModBulletText}>{item}</Text>
+                  </View>
+                ))}
+                <TouchableOpacity style={[styles.connectBtn, { alignSelf: 'center', marginTop: 24 }]} activeOpacity={0.85} onPress={() => { setActivePage(null); openForm(); }}>
+                  <Text style={styles.connectBtnText}>Schedule a Free Discovery Call</Text>
+                </TouchableOpacity>
+              </View>
+            </>}
+
+            {/* ── PROGRAMS ── */}
+            {activePage === 'Programs' && <>
+              <View style={styles.pageModBody}>
+                <Text style={[styles.pageModH1, serifWeb]}>Our Programs</Text>
+                <Text style={styles.pageModPara}>
+                  Whether you're looking for intensive one-on-one support or a structured group experience, there's a program designed to meet you where you are.
+                </Text>
+                {[
+                  {
+                    icon: 'people-outline',
+                    title: 'Couples Intensive',
+                    tag: '8 Weeks',
+                    desc: 'A deep-dive coaching program for couples ready to do the real work. Covers communication, intimacy, conflict resolution, and rebuilding connection — with weekly sessions and between-session support.',
+                  },
+                  {
+                    icon: 'person-outline',
+                    title: '1-on-1 Private Coaching',
+                    tag: 'Ongoing',
+                    desc: 'Personalized sessions tailored to your relationship goals. Ideal if you want flexible, ongoing support on your own timeline.',
+                  },
+                  {
+                    icon: 'flame-outline',
+                    title: 'Reignite Weekend Workshop',
+                    tag: 'Intensive',
+                    desc: 'A focused weekend experience for couples who want to accelerate transformation. Combines coaching, guided exercises, and breakthrough conversations in an immersive format.',
+                  },
+                  {
+                    icon: 'laptop-outline',
+                    title: 'Foundations of Intimacy',
+                    tag: 'Self-Paced',
+                    desc: 'A digital course covering the core pillars of intimacy and connection. Work through modules on your own schedule and bring the insights into your relationship.',
+                  },
+                ].map(p => (
+                  <View key={p.title} style={styles.pageModCard}>
+                    <View style={styles.pageModCardTop}>
+                      <View style={styles.benefitIconWrap}>
+                        <Ionicons name={p.icon} size={24} color={C.copper} />
+                      </View>
+                      <View style={styles.pageModCardTag}>
+                        <Text style={styles.pageModCardTagText}>{p.tag}</Text>
+                      </View>
+                    </View>
+                    <Text style={[styles.pageModFeatureTitle, { fontSize: 17, marginBottom: 6 }]}>{p.title}</Text>
+                    <Text style={styles.pageModFeatureDesc}>{p.desc}</Text>
+                  </View>
+                ))}
+                <TouchableOpacity style={[styles.connectBtn, { alignSelf: 'center', marginTop: 8 }]} activeOpacity={0.85} onPress={() => { setActivePage(null); openForm(); }}>
+                  <Text style={styles.connectBtnText}>Find the Right Program</Text>
+                </TouchableOpacity>
+              </View>
+            </>}
+
+            {/* ── RESOURCES ── */}
+            {activePage === 'Resources' && <>
+              <View style={styles.pageModBody}>
+                <Text style={[styles.pageModH1, serifWeb]}>Resources</Text>
+                <Text style={styles.pageModPara}>
+                  Free tools, insights, and guides to support your relationship between sessions — and beyond.
+                </Text>
+                <Text style={[styles.pageModSectionLabel, geoWeb]}>Free Guide</Text>
+                <View style={styles.pageModCard}>
+                  <Ionicons name="document-text-outline" size={32} color={C.copper} style={{ marginBottom: 12 }} />
+                  <Text style={[styles.pageModFeatureTitle, { fontSize: 17 }]}>5 Conversations Every Couple Must Have</Text>
+                  <Text style={[styles.pageModFeatureDesc, { marginTop: 6, marginBottom: 16 }]}>
+                    A practical guide covering the five most important — and often avoided — conversations that determine the health of your relationship.
+                  </Text>
+                  <TouchableOpacity style={styles.pageModOutlineBtn} activeOpacity={0.8} onPress={() => { setActivePage(null); openForm(); }}>
+                    <Text style={styles.pageModOutlineBtnText}>Get the Free Guide</Text>
+                  </TouchableOpacity>
+                </View>
+                <Text style={[styles.pageModSectionLabel, geoWeb]}>Tips & Insights</Text>
+                {[
+                  { icon: 'chatbubbles-outline',  title: 'How to Fight Fair',              desc: 'Turn conflict into closeness with these communication ground rules.' },
+                  { icon: 'heart-outline',         title: 'Rebuilding Desire After Kids',  desc: 'Practical ways to reconnect as partners, not just co-parents.' },
+                  { icon: 'lock-open-outline',     title: 'The Art of Emotional Safety',   desc: 'Why your partner shuts down — and what to do instead of pushing.' },
+                  { icon: 'infinite-outline',      title: 'Breaking the Pursue-Withdraw Cycle', desc: 'Understand the dynamic keeping you both stuck and how to shift it.' },
+                ].map(r => (
+                  <View key={r.title} style={styles.pageModFeature}>
+                    <View style={styles.benefitIconWrap}>
+                      <Ionicons name={r.icon} size={22} color={C.copper} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.pageModFeatureTitle}>{r.title}</Text>
+                      <Text style={styles.pageModFeatureDesc}>{r.desc}</Text>
+                    </View>
+                  </View>
+                ))}
+                <Text style={[styles.pageModSectionLabel, geoWeb]}>Follow Along</Text>
+                <Text style={styles.pageModPara}>Get daily tips, stories, and inspiration on our social channels.</Text>
+                <View style={styles.socialRow}>
+                  {SOCIALS.map((s) => (
+                    <TouchableOpacity key={s.label} style={styles.socialBtn} activeOpacity={0.75} onPress={() => Linking.openURL(s.url)}>
+                      <Image source={s.avatar} style={styles.socialAvatar} />
+                      <Text style={styles.socialLabel}>{s.label}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            </>}
+
+          </ScrollView>
+        </View>
+      </Modal>
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  /* ── PAGE MODALS ── */
+  pageMod: { flex: 1, backgroundColor: C.bg },
+  pageModHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 20, paddingTop: 56, paddingBottom: 16,
+    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.07)',
+  },
+  pageModTitle: { color: C.white, fontSize: 17, fontWeight: '600', letterSpacing: 0.5, textTransform: 'uppercase' },
+  pageModScroll: { flexGrow: 1 },
+  pageModHero: { width: '100%', height: 260, justifyContent: 'flex-end' },
+  pageModHeroImg: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%', resizeMode: 'cover' },
+  pageModHeroOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(10,10,10,0.55)' },
+  pageModHeroText: { padding: 24 },
+  pageModH1: { color: C.white, fontSize: 30, fontWeight: '700', marginBottom: 20 },
+  pageModSubtitle: { color: C.copper, fontSize: 14, fontWeight: '500' },
+  pageModBody: { padding: 24, gap: 0 },
+  pageModPara: { color: C.muted, fontSize: 15, lineHeight: 24, marginBottom: 20 },
+  pageModSectionLabel: {
+    color: C.copper, fontSize: 11, fontWeight: '700', letterSpacing: 1.4,
+    textTransform: 'uppercase', marginTop: 8, marginBottom: 14,
+  },
+  pageModBullet: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 10 },
+  pageModBulletText: { color: C.muted, fontSize: 14, lineHeight: 22, flex: 1 },
+  pageModFeature: { flexDirection: 'row', gap: 14, marginBottom: 20, alignItems: 'flex-start' },
+  pageModFeatureTitle: { color: C.white, fontSize: 15, fontWeight: '600', marginBottom: 4 },
+  pageModFeatureDesc: { color: C.muted, fontSize: 13, lineHeight: 20 },
+  pageModCard: {
+    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 14, padding: 20, marginBottom: 16,
+  },
+  pageModCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  pageModCardTag: { backgroundColor: 'rgba(201,136,104,0.15)', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4 },
+  pageModCardTagText: { color: C.copper, fontSize: 12, fontWeight: '600' },
+  pageModOutlineBtn: {
+    borderWidth: 1, borderColor: C.copper, borderRadius: 24,
+    paddingVertical: 12, paddingHorizontal: 24, alignSelf: 'flex-start',
+  },
+  pageModOutlineBtnText: { color: C.copper, fontSize: 14, fontWeight: '600' },
+
   rootWrap: { flex: 1, backgroundColor: C.bg },
   root: { flex: 1, backgroundColor: C.bg },
   rootContent: { flexGrow: 1 },
@@ -1248,8 +1495,7 @@ const styles = StyleSheet.create({
   benefitsSectionDesktop: { paddingVertical: 72 },
   benefitsScrollView: { alignSelf: 'stretch', overflow: 'hidden' },
   benefitsScroll: {
-    paddingHorizontal: 44,
-    gap: 12,
+    gap: 16,
     paddingBottom: 8,
   },
   benefitCard: {
