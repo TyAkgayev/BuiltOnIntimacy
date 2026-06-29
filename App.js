@@ -1052,20 +1052,14 @@ export default function App() {
 
             {/* ── ABOUT ── */}
             {activePage === 'About' && <>
-              <View style={styles.pageModHero}>
-                <Image source={require('./assets/couple.png')} style={styles.pageModHeroImg} />
-                <View style={styles.pageModHeroOverlay} />
-                <View style={styles.pageModHeroText}>
-                  <Text style={[styles.pageModH1, serifWeb]}>Meet Fateemah Jobe</Text>
-                  <Text style={styles.pageModSubtitle}>Relationship Expert & Sexuality Coach</Text>
-                </View>
-              </View>
               <View style={styles.pageModBody}>
                 <Image
                   source={require('./assets/fateemah_jobe.png')}
                   style={styles.coachPhoto}
                   resizeMode="cover"
                 />
+                <Text style={[styles.pageModH1, serifWeb]}>Meet Fateemah Jobe</Text>
+                <Text style={[styles.pageModSubtitle, { marginBottom: 20 }]}>Relationship Expert & Sexuality Coach</Text>
                 <Text style={styles.pageModPara}>
                   Fateemah Jobe is a certified Relationship Expert and Sexuality Coach dedicated to helping couples move beyond surface-level fixes and into the deeper work — rebuilding trust, reigniting desire, and creating a partnership that truly thrives.
                 </Text>
@@ -1265,7 +1259,7 @@ const styles = StyleSheet.create({
   pageModSubtitle: { color: C.copper, fontSize: 14, fontWeight: '500' },
   pageModBody: { padding: 24, gap: 0 },
   pageModPara: { color: C.muted, fontSize: 15, lineHeight: 24, marginBottom: 20 },
-  coachPhoto: { width: '100%', height: 340, borderRadius: 16, marginBottom: 24 },
+  coachPhoto: { width: 280, height: 280, borderRadius: 12, marginBottom: 24, alignSelf: 'center', borderWidth: 2, borderColor: C.divider },
   pageModSectionLabel: {
     color: C.copper, fontSize: 11, fontWeight: '700', letterSpacing: 1.4,
     textTransform: 'uppercase', marginTop: 8, marginBottom: 14,
