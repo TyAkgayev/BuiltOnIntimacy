@@ -154,6 +154,15 @@ export default function App() {
   const videoProgress = useRef(new Animated.Value(0)).current;
   const btnFlip = useRef(new Animated.Value(1)).current;
   const ctaPulse = useRef(new Animated.Value(0)).current;
+  const splashAnim = useRef(new Animated.Value(1)).current;
+  const heroLoadCount = useRef(0);
+
+  const onHeroLoad = () => {
+    heroLoadCount.current += 1;
+    if (heroLoadCount.current >= 2) {
+      Animated.timing(splashAnim, { toValue: 0, duration: 400, useNativeDriver: true }).start();
+    }
+  };
 
   const [menuOpen, setMenuOpen]       = useState(false);
   const [formOpen, setFormOpen]       = useState(false);
@@ -472,6 +481,7 @@ export default function App() {
               { transform: [{ translateY: bgTranslate }] },
             ]}
             resizeMode="cover"
+            onLoadEnd={onHeroLoad}
           />
 
           {isDesktop ? (
@@ -498,6 +508,7 @@ export default function App() {
                   source={require('./assets/couple.png')}
                   style={[{ width: coupleW, height: coupleH }, { transform: [{ translateY: coupleTranslate }] }]}
                   resizeMode="contain"
+                  onLoadEnd={onHeroLoad}
                 />
               </View>
             </View>
@@ -522,6 +533,7 @@ export default function App() {
                   source={require('./assets/couple.png')}
                   style={[styles.coupleImgLandscape, { transform: [{ translateY: coupleTranslate }] }]}
                   resizeMode="cover"
+                  onLoadEnd={onHeroLoad}
                 />
                 <View style={styles.heroCoupleGradientLeft} />
               </View>
@@ -534,6 +546,7 @@ export default function App() {
                   source={require('./assets/couple.png')}
                   style={[styles.coupleImgMobile, { transform: [{ translateY: coupleTranslate }] }]}
                   resizeMode="cover"
+                  onLoadEnd={onHeroLoad}
                 />
                 {/* gradient fades the bottom of the couple into the content below */}
                 <View style={styles.heroCoupleGradient} />
@@ -1255,11 +1268,22 @@ export default function App() {
           </ScrollView>
         </View>
       </Modal>
+
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.splashCover, { opacity: splashAnim }]}
+      />
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  splashCover: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: C.bg,
+    zIndex: 9999,
+  },
+
   /* ── PAGE MODALS ── */
   pageMod: { flex: 1, backgroundColor: C.bg },
   pageModHeader: {
