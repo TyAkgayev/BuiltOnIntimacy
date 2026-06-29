@@ -23,6 +23,10 @@ if (Platform.OS === 'web') {
   link.href =
     'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,600&family=Great+Vibes&display=swap';
   document.head.appendChild(link);
+
+  const noSelect = document.createElement('style');
+  noSelect.textContent = '* { user-select: none !important; -webkit-user-select: none !important; }';
+  document.head.appendChild(noSelect);
 }
 
 const C = {
@@ -124,6 +128,8 @@ export default function App() {
   const coupleH = Math.round(coupleW / COUPLE_RATIO);
 
   const scrollY = useRef(new Animated.Value(0)).current;
+  const benefitScrollRef = useRef(null);
+  const benefitDrag = useRef({ active: false, startX: 0, scrollLeft: 0 });
   const featureScales = useRef(FEATURES.map(() => new Animated.Value(1))).current;
   const videoContainerRef = useRef(null);
   const videoRef = useRef(null);
@@ -267,6 +273,39 @@ export default function App() {
     }, 3500);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web' || isDesktop) return;
+    const node = benefitScrollRef.current?.getScrollableNode?.();
+    if (!node) return;
+    const drag = benefitDrag.current;
+    const onMouseDown = (e) => {
+      drag.active = true;
+      drag.startX = e.pageX;
+      drag.scrollLeft = node.scrollLeft;
+      node.style.cursor = 'grabbing';
+      e.stopPropagation();
+    };
+    const onMouseMove = (e) => {
+      if (!drag.active) return;
+      e.preventDefault();
+      node.scrollLeft = drag.scrollLeft - (e.pageX - drag.startX);
+    };
+    const onMouseUp = () => {
+      if (!drag.active) return;
+      drag.active = false;
+      node.style.cursor = 'grab';
+    };
+    node.style.cursor = 'grab';
+    node.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      node.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [isDesktop]);
 
   const openForm = () => {
     setSubmitted(false);
@@ -608,6 +647,7 @@ export default function App() {
           ) : (
             <>
               <ScrollView
+                ref={benefitScrollRef}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 snapToInterval={benefitSnapInterval}
@@ -1600,9 +1640,9 @@ const styles = StyleSheet.create({
   },
   howSectionDesktop: { paddingHorizontal: 80 },
   howSteps: { width: '100%', gap: 32, marginTop: 16 },
-  howStepsDesktop: { flexDirection: 'row', justifyContent: 'center', gap: 40 },
+  howStepsDesktop: { flexDirection: 'row', justifyContent: 'center', gap: 40, width: 'auto' },
   howStep: { flex: 1, maxWidth: 340 },
-  howStepDesktop: { alignItems: 'flex-start' },
+  howStepDesktop: { alignItems: 'flex-start', flex: 0, width: 300 },
   howStepNumber: { color: C.copper, fontSize: 40, fontWeight: '700', opacity: 0.5, marginBottom: 8 },
   howStepLine: { width: 40, height: 2, backgroundColor: C.copper, opacity: 0.4, marginBottom: 16 },
   howStepTitle: { color: C.white, fontSize: 18, fontWeight: '700', marginBottom: 10 },
