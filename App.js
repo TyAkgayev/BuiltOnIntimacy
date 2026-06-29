@@ -227,7 +227,15 @@ export default function App() {
         ([entry]) => {
           if (entry.isIntersecting) {
             hlsRef.current?.startLoad();
-            videoRef.current?.play();
+            const vid = videoRef.current;
+            if (!vid) return;
+            vid.muted = false;
+            vid.play().catch(() => {
+              // Browser blocked unmuted autoplay — fall back to muted
+              vid.muted = true;
+              setVideoMuted(true);
+              vid.play().catch(() => {});
+            });
             setVideoPlaying(true);
             Animated.timing(videoProgress, { toValue: 1, duration: 500, useNativeDriver: false }).start();
             observer.disconnect();
@@ -659,6 +667,17 @@ export default function App() {
                 </View>
               </Animated.View>
             </TouchableOpacity>
+            {/* Unmute nudge — visible when playing muted (browser blocked unmuted autoplay) */}
+            {videoPlaying && videoMuted && (
+              <TouchableOpacity
+                style={styles.unmuteNudge}
+                activeOpacity={0.8}
+                onPress={() => { if (videoRef.current) { videoRef.current.muted = false; setVideoMuted(false); } }}
+              >
+                <Ionicons name="volume-mute" size={14} color={C.white} />
+                <Text style={styles.unmuteNudgeText}>Tap to unmute</Text>
+              </TouchableOpacity>
+            )}
             {/* Bottom control bar */}
             <View style={styles.videoBar}>
               <TouchableOpacity onPress={toggleVideo}>
@@ -1633,6 +1652,13 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   videoTime: { color: 'rgba(255,255,255,0.7)', fontSize: 11 },
+  unmuteNudge: {
+    position: 'absolute', top: 12, right: 12,
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 20,
+    paddingVertical: 6, paddingHorizontal: 12,
+  },
+  unmuteNudgeText: { color: C.white, fontSize: 12, fontWeight: '600' },
 
   /* ── BENEFITS ── */
   benefitsSection: {
