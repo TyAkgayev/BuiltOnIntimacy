@@ -136,7 +136,7 @@ const BENEFITS = [
 export default function App() {
   const isWeb = Platform.OS === 'web';
   const { width, height } = useWindowDimensions();
-  const isDesktop = width >= 820 && height > 500;
+  const isDesktop = width >= 900 && height > 500;
   const isMobileLandscape = !isDesktop && width > height;
 
   const COUPLE_RATIO = 1536 / 1024;
