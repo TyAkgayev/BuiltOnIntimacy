@@ -92,10 +92,10 @@ const TESTIMONIALS = [
 ];
 
 const SOCIALS = [
-  { label: 'Instagram', url: 'https://www.instagram.com/mrsjobe_therelationshipbuilder/', avatar: require('./assets/insta.PNG') },
-  { label: 'Snapchat',  url: 'https://snapchat.com/t/UIOVLDhF',                          avatar: require('./assets/snap.PNG') },
-  { label: 'TikTok',    url: 'https://tiktok.com/@mrsjobe24_7relations',                  avatar: require('./assets/tiktok.PNG') },
-  { label: 'YouTube',   url: 'https://www.youtube.com/@Mrsjobe',                          avatar: require('./assets/youtube.PNG') },
+  { label: 'Instagram', url: 'https://www.instagram.com/mrsjobe_therelationshipbuilder/', avatar: require('./assets/insta.png') },
+  { label: 'Snapchat',  url: 'https://snapchat.com/t/UIOVLDhF',                          avatar: require('./assets/snap.png') },
+  { label: 'TikTok',    url: 'https://tiktok.com/@mrsjobe24_7relations',                  avatar: require('./assets/tiktok.png') },
+  { label: 'YouTube',   url: 'https://www.youtube.com/@Mrsjobe',                          avatar: require('./assets/youtube.png') },
 ];
 
 const HOW_IT_WORKS = [
@@ -139,6 +139,7 @@ export default function App() {
   const [message, setMessage]         = useState('');
   const [activeFeature, setActiveFeature] = useState(null);
   const [videoPlaying, setVideoPlaying]   = useState(false);
+  const [videoMuted, setVideoMuted]             = useState(true);
   const [videoCurrentTime, setVideoCurrentTime] = useState(0);
   const [videoDuration, setVideoDuration]       = useState(0);
   const [btnIndex, setBtnIndex]           = useState(0);
@@ -513,6 +514,7 @@ export default function App() {
               ref: videoRef,
               style: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' },
               playsInline: true,
+              muted: true,
               preload: 'none',
               onTimeUpdate: (e) => setVideoCurrentTime(e.target.currentTime),
               onLoadedMetadata: (e) => setVideoDuration(e.target.duration),
@@ -530,6 +532,14 @@ export default function App() {
             <View style={styles.videoBar}>
               <TouchableOpacity onPress={toggleVideo}>
                 <Ionicons name={videoPlaying ? 'pause' : 'play'} size={18} color={C.white} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => {
+                if (!videoRef.current) return;
+                const next = !videoMuted;
+                videoRef.current.muted = next;
+                setVideoMuted(next);
+              }}>
+                <Ionicons name={videoMuted ? 'volume-mute' : 'volume-high'} size={18} color={C.white} />
               </TouchableOpacity>
               <View style={styles.videoProgressTrack}>
                 <View style={[styles.videoProgressFill, {
