@@ -27,6 +27,22 @@ if (Platform.OS === 'web') {
   const noSelect = document.createElement('style');
   noSelect.textContent = '* { user-select: none !important; -webkit-user-select: none !important; }';
   document.head.appendChild(noSelect);
+
+  // Fix transparent favicon — bake a dark background so Chrome tab doesn't show white
+  const faviconImg = new Image();
+  faviconImg.onload = () => {
+    const c = document.createElement('canvas');
+    c.width = c.height = 64;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, 64, 64);
+    ctx.drawImage(faviconImg, 0, 0, 64, 64);
+    let iconLink = document.querySelector("link[rel='icon']") || document.querySelector("link[rel*='icon']");
+    if (!iconLink) { iconLink = document.createElement('link'); iconLink.rel = 'icon'; document.head.appendChild(iconLink); }
+    iconLink.type = 'image/png';
+    iconLink.href = c.toDataURL('image/png');
+  };
+  faviconImg.src = '/favicon.ico';
 }
 
 const C = {
@@ -130,6 +146,7 @@ export default function App() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const benefitScrollRef = useRef(null);
   const benefitDrag = useRef({ active: false, startX: 0, scrollLeft: 0 });
+  const benefitSnapRef = useRef(0);
   const featureScales = useRef(FEATURES.map(() => new Animated.Value(1))).current;
   const videoContainerRef = useRef(null);
   const videoRef = useRef(null);
@@ -159,9 +176,10 @@ export default function App() {
 
   const benefitPeek = 44;
   const benefitGap = 16;
-  const benefitCardW = width - 2 * benefitPeek;
+  const benefitCardW = isDesktop ? Math.min(480, Math.floor(width * 0.38)) : width - 2 * benefitPeek;
   const benefitSnapInterval = benefitCardW + benefitGap;
   const benefitPadding = (width - benefitCardW) / 2;
+  benefitSnapRef.current = benefitSnapInterval;
 
   const onBenefitScroll = (e) => {
     const x = e.nativeEvent.contentOffset.x;
@@ -306,6 +324,32 @@ export default function App() {
       node.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [isDesktop]);
+
+  useEffect(() => {
+    if (!isDesktop || Platform.OS !== 'web') return;
+    const getNode = () => benefitScrollRef.current?.getScrollableNode?.() ?? benefitScrollRef.current;
+    const node = getNode();
+    if (node) node.style.scrollBehavior = 'smooth';
+    let localIdx = 0;
+    const id = setInterval(() => {
+      const n = getNode();
+      if (!n) return;
+      localIdx = (localIdx + 1) % BENEFITS.length;
+      setActiveBenefitIdx(localIdx);
+      if (localIdx === 0) {
+        n.style.scrollBehavior = 'auto';
+        n.scrollLeft = 0;
+        n.style.scrollBehavior = 'smooth';
+      } else {
+        n.scrollLeft = localIdx * benefitSnapRef.current;
+      }
+    }, 1500);
+    return () => {
+      clearInterval(id);
+      const n = getNode();
+      if (n) n.style.scrollBehavior = '';
     };
   }, [isDesktop]);
 
@@ -620,7 +664,7 @@ export default function App() {
         <View style={[styles.howSection, isDesktop && styles.howSectionDesktop]}>
           <Text style={styles.sectionLabel}>Simple Process</Text>
           <Text style={[styles.sectionHeading, serifWeb]}>How It Works</Text>
-          <View style={[styles.howSteps, isDesktop && styles.howStepsDesktop]}>
+          <View style={[styles.howSteps, isDesktop ? styles.howStepsDesktop : { maxWidth: 440 }]}>
             {HOW_IT_WORKS.map((s, i) => (
               <View key={s.step} style={[styles.howStep, isDesktop && styles.howStepDesktop]}>
                 <Text style={[styles.howStepNumber, geoWeb]}>{s.step}</Text>
@@ -636,10 +680,28 @@ export default function App() {
         <View style={[styles.benefitsSection, isDesktop && styles.benefitsSectionDesktop]}>
           <Text style={styles.sectionLabel}>Why Us</Text>
           <Text style={[styles.sectionHeading, serifWeb]}>Our Benefits</Text>
-          {isDesktop ? (
-            <View style={styles.benefitsGrid}>
-              {BENEFITS.map((b) => (
-                <View key={b.title} style={[styles.benefitCard, styles.benefitCardDesktop]}>
+          <>
+            <ScrollView
+              ref={benefitScrollRef}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={benefitSnapInterval}
+              snapToAlignment="center"
+              decelerationRate="fast"
+              contentContainerStyle={[styles.benefitsScroll, { paddingHorizontal: benefitPadding }]}
+              style={[styles.benefitsScrollView, isWeb && { scrollSnapType: 'x mandatory' }]}
+              onScroll={onBenefitScroll}
+              scrollEventThrottle={16}
+            >
+              {BENEFITS.map((b, i) => (
+                <View
+                  key={b.title}
+                  style={[
+                    styles.benefitCard,
+                    { width: benefitCardW, opacity: i === activeBenefitIdx ? 1 : 0.35 },
+                    isWeb && { scrollSnapAlign: 'center', transition: 'opacity 0.25s', userSelect: 'none' },
+                  ]}
+                >
                   <View style={styles.benefitIconWrap}>
                     <Ionicons name={b.icon} size={28} color={C.copper} />
                   </View>
@@ -647,48 +709,16 @@ export default function App() {
                   <Text style={styles.benefitDesc}>{b.desc}</Text>
                 </View>
               ))}
+            </ScrollView>
+            <View style={styles.benefitDots}>
+              {BENEFITS.map((_, i) => (
+                <View
+                  key={i}
+                  style={[styles.benefitDot, i === activeBenefitIdx && styles.benefitDotActive]}
+                />
+              ))}
             </View>
-          ) : (
-            <>
-              <ScrollView
-                ref={benefitScrollRef}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                snapToInterval={benefitSnapInterval}
-                snapToAlignment="center"
-                decelerationRate="fast"
-                contentContainerStyle={[styles.benefitsScroll, { paddingHorizontal: benefitPadding }]}
-                style={[styles.benefitsScrollView, isWeb && { scrollSnapType: 'x mandatory' }]}
-                onScroll={onBenefitScroll}
-                scrollEventThrottle={16}
-              >
-                {BENEFITS.map((b, i) => (
-                  <View
-                    key={b.title}
-                    style={[
-                      styles.benefitCard,
-                      { width: benefitCardW, opacity: i === activeBenefitIdx ? 1 : 0.35 },
-                      isWeb && { scrollSnapAlign: 'center', transition: 'opacity 0.25s', userSelect: 'none' },
-                    ]}
-                  >
-                    <View style={styles.benefitIconWrap}>
-                      <Ionicons name={b.icon} size={28} color={C.copper} />
-                    </View>
-                    <Text style={[styles.benefitTitle, geoWeb]}>{b.title}</Text>
-                    <Text style={styles.benefitDesc}>{b.desc}</Text>
-                  </View>
-                ))}
-              </ScrollView>
-              <View style={styles.benefitDots}>
-                {BENEFITS.map((_, i) => (
-                  <View
-                    key={i}
-                    style={[styles.benefitDot, i === activeBenefitIdx && styles.benefitDotActive]}
-                  />
-                ))}
-              </View>
-            </>
-          )}
+          </>
           <TouchableOpacity style={[styles.connectBtn, { marginTop: 32, alignSelf: 'center' }]} activeOpacity={0.85} onPress={openForm}>
             <Text style={styles.connectBtnText}>Get Started</Text>
           </TouchableOpacity>
