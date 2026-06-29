@@ -23,12 +23,6 @@ if (Platform.OS === 'web') {
   link.href =
     'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,600&family=Great+Vibes&display=swap';
   document.head.appendChild(link);
-
-  // iOS home screen bookmark icon
-  const touchIcon = document.createElement('link');
-  touchIcon.rel = 'apple-touch-icon';
-  touchIcon.href = Image.resolveAssetSource(require('./assets/Intricate_I.png')).uri;
-  document.head.appendChild(touchIcon);
 }
 
 const C = {
@@ -171,6 +165,24 @@ export default function App() {
 
   const videoW = isDesktop ? Math.min(width - 120, 960) : width - 56;
   const videoH = Math.round(videoW * 9 / 16);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    // Inject apple-touch-icon using a temporary img to resolve the Metro asset URL
+    try {
+      const img = document.createElement('img');
+      img.onload = () => {
+        const el = document.createElement('link');
+        el.rel = 'apple-touch-icon';
+        el.href = img.src;
+        document.head.appendChild(el);
+      };
+      // Metro serves assets at this path in both dev and prod
+      const assetId = require('./assets/Intricate_I.png');
+      const src = typeof assetId === 'string' ? assetId : null;
+      if (src) img.src = src;
+    } catch (_) {}
+  }, []);
 
   useEffect(() => {
     if (Platform.OS !== 'web') return;
