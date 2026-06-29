@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, createElement } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
   Animated,
@@ -125,6 +125,8 @@ export default function App() {
   const scrollY = useRef(new Animated.Value(0)).current;
   const featureScales = useRef(FEATURES.map(() => new Animated.Value(1))).current;
   const videoContainerRef = useRef(null);
+  const videoRef = useRef(null);
+  const hlsRef = useRef(null);
   const videoProgress = useRef(new Animated.Value(0)).current;
   const btnFlip = useRef(new Animated.Value(1)).current;
 
@@ -136,6 +138,8 @@ export default function App() {
   const [message, setMessage]         = useState('');
   const [activeFeature, setActiveFeature] = useState(null);
   const [videoPlaying, setVideoPlaying]   = useState(false);
+  const [videoCurrentTime, setVideoCurrentTime] = useState(0);
+  const [videoDuration, setVideoDuration]       = useState(0);
   const [btnIndex, setBtnIndex]           = useState(0);
   const [authOpen, setAuthOpen]           = useState(false);
   const [authTab, setAuthTab]             = useState('login');
@@ -166,8 +170,10 @@ export default function App() {
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
+            hlsRef.current?.startLoad();
+            videoRef.current?.play();
             setVideoPlaying(true);
-            Animated.timing(videoProgress, { toValue: 1, duration: 5000, useNativeDriver: false }).start();
+            Animated.timing(videoProgress, { toValue: 1, duration: 500, useNativeDriver: false }).start();
             observer.disconnect();
           }
         },
@@ -177,6 +183,54 @@ export default function App() {
     }, 800);
     return () => clearTimeout(timer);
   }, []);
+
+  const HLS_SRC = 'https://customer-hn6ktj1ftkgu18l4.cloudflarestream.com/59106224cea112dfe4fceca8eef3b3d6/manifest/video.m3u8';
+
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    let destroyed = false;
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari — native HLS
+      video.src = HLS_SRC;
+    } else {
+      import('hls.js').then(({ default: Hls }) => {
+        if (destroyed || !Hls.isSupported()) return;
+        const hls = new Hls({ autoStartLoad: false });
+        hls.loadSource(HLS_SRC);
+        hls.attachMedia(video);
+        hlsRef.current = hls;
+      });
+    }
+
+    return () => {
+      destroyed = true;
+      hlsRef.current?.destroy();
+      hlsRef.current = null;
+    };
+  }, []);
+
+  const formatTime = (s) => {
+    if (!s || isNaN(s)) return '0:00';
+    const m = Math.floor(s / 60);
+    return `${m}:${Math.floor(s % 60).toString().padStart(2, '0')}`;
+  };
+
+  const toggleVideo = () => {
+    if (Platform.OS !== 'web' || !videoRef.current) return;
+    if (videoPlaying) {
+      videoRef.current.pause();
+      setVideoPlaying(false);
+      videoProgress.setValue(0);
+    } else {
+      hlsRef.current?.startLoad();
+      videoRef.current.play();
+      setVideoPlaying(true);
+      Animated.timing(videoProgress, { toValue: 1, duration: 500, useNativeDriver: false }).start();
+    }
+  };
 
   const BTN_LABELS = ['Schedule Sessions 24/7', 'Download Our App'];
 
@@ -453,24 +507,36 @@ export default function App() {
             Fateemah Jobe, Relationship Expert and Sexuality Coach
           </Text>
           <View ref={videoContainerRef} style={[styles.videoPlayer, { width: videoW, height: videoH }]}>
-            {/* Dark thumbnail area */}
-            <View style={styles.videoThumbnail} />
+            {/* Real video */}
+            {Platform.OS === 'web' && createElement('video', {
+              ref: videoRef,
+              style: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' },
+              playsInline: true,
+              preload: 'none',
+              onTimeUpdate: (e) => setVideoCurrentTime(e.target.currentTime),
+              onLoadedMetadata: (e) => setVideoDuration(e.target.duration),
+              onEnded: () => { setVideoPlaying(false); videoProgress.setValue(0); },
+            })}
             {/* Play / pause overlay */}
-            <Animated.View style={[styles.videoOverlay, { opacity: videoPlaying ? videoProgress.interpolate({ inputRange: [0, 0.15], outputRange: [1, 0], extrapolate: 'clamp' }) : 1 }]}>
-              <View style={styles.playBtnCircle}>
-                <Ionicons name={videoPlaying ? 'pause' : 'play'} size={34} color={C.bg} style={{ marginLeft: videoPlaying ? 0 : 3 }} />
-              </View>
-            </Animated.View>
+            <TouchableOpacity onPress={toggleVideo} activeOpacity={1} style={styles.videoOverlay}>
+              <Animated.View style={{ opacity: videoPlaying ? videoProgress.interpolate({ inputRange: [0, 0.15], outputRange: [1, 0], extrapolate: 'clamp' }) : 1 }}>
+                <View style={styles.playBtnCircle}>
+                  <Ionicons name={videoPlaying ? 'pause' : 'play'} size={34} color={C.bg} style={{ marginLeft: videoPlaying ? 0 : 3 }} />
+                </View>
+              </Animated.View>
+            </TouchableOpacity>
             {/* Bottom control bar */}
             <View style={styles.videoBar}>
-              <Ionicons name={videoPlaying ? 'pause' : 'play'} size={18} color={C.white} />
+              <TouchableOpacity onPress={toggleVideo}>
+                <Ionicons name={videoPlaying ? 'pause' : 'play'} size={18} color={C.white} />
+              </TouchableOpacity>
               <View style={styles.videoProgressTrack}>
-                <Animated.View style={[styles.videoProgressFill, {
-                  width: videoProgress.interpolate({ inputRange: [0, 1], outputRange: ['0%', '35%'] }),
+                <View style={[styles.videoProgressFill, {
+                  width: videoDuration > 0 ? `${(videoCurrentTime / videoDuration) * 100}%` : '0%',
                 }]} />
               </View>
               <Text style={styles.videoTime}>
-                {videoPlaying ? '0:18' : '0:00'} / 12:34
+                {formatTime(videoCurrentTime)} / {formatTime(videoDuration)}
               </Text>
             </View>
           </View>
