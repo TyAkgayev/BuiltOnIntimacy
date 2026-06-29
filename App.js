@@ -1064,10 +1064,14 @@ export default function App() {
                   Fateemah Jobe is a certified Relationship Expert and Sexuality Coach dedicated to helping couples move beyond surface-level fixes and into the deeper work — rebuilding trust, reigniting desire, and creating a partnership that truly thrives.
                 </Text>
                 <Text style={styles.pageModPara}>
+                  With over 20 years as a police officer specializing in domestic violence, Fateemah has witnessed firsthand the devastating cost of broken communication and unresolved conflict. That front-line experience drives everything she does — bringing urgency, empathy, and hard-won insight into every session.
+                </Text>
+                <Text style={styles.pageModPara}>
                   After years of watching couples struggle in silence, she founded BuiltOnIntimacy with one mission: to give every relationship the tools, language, and safe space it needs to flourish. Her approach blends evidence-based communication frameworks with real, compassionate guidance — tailored to your unique dynamic.
                 </Text>
                 <Text style={[styles.pageModSectionLabel, geoWeb]}>Credentials</Text>
                 {[
+                  '20-Year Law Enforcement Veteran — Domestic Violence Specialist',
                   'Certified Relationship Coach',
                   'Sexuality & Intimacy Specialist',
                   'Communication & Conflict Resolution Expert',
