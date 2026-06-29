@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, createElement } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
   Animated,
+  Image,
   KeyboardAvoidingView,
   Linking,
   Modal,
@@ -91,10 +92,10 @@ const TESTIMONIALS = [
 ];
 
 const SOCIALS = [
-  { lib: 'Ionicons',              icon: 'logo-instagram', label: 'Instagram', url: 'https://instagram.com/mrsjobe_tehrelationshipbuilder', color: '#E1306C' },
-  { lib: 'MaterialCommunityIcons', icon: 'snapchat',      label: 'Snapchat',  url: 'https://snapchat.com/add/Mssexi_independent',          color: '#FFFC00' },
-  { lib: 'Ionicons',              icon: 'logo-tiktok',    label: 'TikTok',    url: 'https://tiktok.com/@mrsjobe24_7relations',              color: '#ffffff' },
-  { lib: 'Ionicons',              icon: 'logo-youtube',   label: 'YouTube',   url: 'https://www.youtube.com/@Mrsjobe',                      color: '#FF0000' },
+  { label: 'Instagram', url: 'https://www.instagram.com/mrsjobe_therelationshipbuilder/', avatar: require('./assets/insta.PNG') },
+  { label: 'Snapchat',  url: 'https://snapchat.com/t/UIOVLDhF',                          avatar: require('./assets/snap.PNG') },
+  { label: 'TikTok',    url: 'https://tiktok.com/@mrsjobe24_7relations',                  avatar: require('./assets/tiktok.PNG') },
+  { label: 'YouTube',   url: 'https://www.youtube.com/@Mrsjobe',                          avatar: require('./assets/youtube.PNG') },
 ];
 
 const HOW_IT_WORKS = [
@@ -653,10 +654,7 @@ export default function App() {
                 activeOpacity={0.75}
                 onPress={() => Linking.openURL(s.url)}
               >
-                {s.lib === 'MaterialCommunityIcons'
-                  ? <MaterialCommunityIcons name={s.icon} size={26} color={s.color} />
-                  : <Ionicons name={s.icon} size={26} color={s.color} />
-                }
+                <Image source={s.avatar} style={styles.socialAvatar} />
                 <Text style={styles.socialLabel}>{s.label}</Text>
               </TouchableOpacity>
             ))}
@@ -1121,6 +1119,7 @@ const styles = StyleSheet.create({
   socialSubtitle: { color: C.muted, fontSize: 15, textAlign: 'center', marginBottom: 36 },
   socialRow: { flexDirection: 'row', gap: 20, marginBottom: 48 },
   socialBtn: { alignItems: 'center', gap: 8 },
+  socialAvatar: { width: 56, height: 56, borderRadius: 28 },
   socialLabel: { color: C.muted, fontSize: 12 },
   footerCopy: { color: '#6b3030', fontSize: 12, textAlign: 'center' },
 
