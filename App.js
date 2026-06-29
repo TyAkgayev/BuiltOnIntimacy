@@ -172,7 +172,7 @@ export default function App() {
   const [message, setMessage]         = useState('');
   const [activeFeature, setActiveFeature] = useState(null);
   const [videoPlaying, setVideoPlaying]   = useState(false);
-  const [videoMuted, setVideoMuted]             = useState(true);
+  const [videoMuted, setVideoMuted]             = useState(false);
   const [videoCurrentTime, setVideoCurrentTime] = useState(0);
   const [videoDuration, setVideoDuration]       = useState(0);
   const [btnIndex, setBtnIndex]           = useState(0);
@@ -646,7 +646,6 @@ export default function App() {
               ref: videoRef,
               style: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' },
               playsInline: true,
-              muted: true,
               preload: 'none',
               onTimeUpdate: (e) => setVideoCurrentTime(e.target.currentTime),
               onLoadedMetadata: (e) => setVideoDuration(e.target.duration),
