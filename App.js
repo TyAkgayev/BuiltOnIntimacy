@@ -153,6 +153,7 @@ export default function App() {
   const hlsRef = useRef(null);
   const videoProgress = useRef(new Animated.Value(0)).current;
   const btnFlip = useRef(new Animated.Value(1)).current;
+  const ctaPulse = useRef(new Animated.Value(0)).current;
 
   const [menuOpen, setMenuOpen]       = useState(false);
   const [formOpen, setFormOpen]       = useState(false);
@@ -293,6 +294,15 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(ctaPulse, { toValue: 1, duration: 2000, useNativeDriver: false }),
+        Animated.timing(ctaPulse, { toValue: 0, duration: 2000, useNativeDriver: false }),
+      ])
+    ).start();
+  }, []);
+
+  useEffect(() => {
     if (Platform.OS !== 'web' || isDesktop) return;
     const node = benefitScrollRef.current?.getScrollableNode?.();
     if (!node) return;
@@ -398,6 +408,11 @@ export default function App() {
   const serifWeb = isWeb ? { fontFamily: '"Playfair Display", Georgia, serif' } : {};
   const scriptWeb = isWeb ? { fontFamily: '"Great Vibes", cursive' } : {};
   const geoWeb = isWeb ? { fontFamily: 'Georgia, serif' } : {};
+
+  const ctaBtnBg = ctaPulse.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: ['#6b0f1a', '#c0392b', '#6b0f1a'],
+  });
 
   return (
     <>
@@ -758,9 +773,11 @@ export default function App() {
             Your relationship deserves the same care and investment as everything else in your life.
             Take the first step today.
           </Text>
-          <TouchableOpacity style={styles.ctaBtn} activeOpacity={0.85} onPress={openForm}>
-            <Text style={styles.ctaBtnText}>Start Your Journey</Text>
-          </TouchableOpacity>
+          <Animated.View style={[styles.ctaBtn, { backgroundColor: ctaBtnBg }]}>
+            <TouchableOpacity activeOpacity={0.85} onPress={openForm} style={styles.ctaBtnInner}>
+              <Text style={styles.ctaBtnText}>Start Your Journey</Text>
+            </TouchableOpacity>
+          </Animated.View>
         </View>
 
         {/* ── SOCIAL ── */}
@@ -1703,13 +1720,12 @@ const styles = StyleSheet.create({
   ctaScript: { color: C.copper, fontSize: 28, textAlign: 'center', marginBottom: 20, zIndex: 1 },
   ctaBody: { color: C.muted, fontSize: 15, lineHeight: 24, textAlign: 'center', maxWidth: 460, marginBottom: 40, zIndex: 1 },
   ctaBtn: {
-    backgroundColor: C.copper,
-    paddingVertical: 16,
-    paddingHorizontal: 40,
     borderRadius: 50,
     zIndex: 1,
+    overflow: 'hidden',
   },
-  ctaBtnText: { color: '#1a0606', fontSize: 16, fontWeight: '700' },
+  ctaBtnInner: { paddingVertical: 16, paddingHorizontal: 40 },
+  ctaBtnText: { color: '#ffffff', fontSize: 16, fontWeight: '700' },
 
   /* ── AUTH MODAL ── */
   authWrap: { flex: 1, backgroundColor: C.bg },
