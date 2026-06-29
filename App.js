@@ -419,9 +419,6 @@ export default function App() {
               <TouchableOpacity style={styles.navGetStartedBtn} activeOpacity={0.85} onPress={openForm}>
                 <Text style={styles.navGetStartedText}>Get Started</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.bookBtn} activeOpacity={0.85} onPress={openForm}>
-                <Text style={styles.bookBtnText}>Book a Call</Text>
-              </TouchableOpacity>
               <TouchableOpacity style={styles.profileBtn} activeOpacity={0.7} onPress={() => setAuthOpen(true)}>
                 <Ionicons name="person-circle-outline" size={34} color={C.white} />
               </TouchableOpacity>
