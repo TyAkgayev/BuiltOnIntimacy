@@ -694,7 +694,7 @@ export default function App() {
                 <Text style={[styles.howStepNumber, geoWeb]}>{s.step}</Text>
                 <View style={styles.howStepLine} />
                 <Text style={[styles.howStepTitle, geoWeb]}>{s.title}</Text>
-                <Text style={styles.howStepDesc}>{s.desc}</Text>
+                <Text style={[styles.howStepDesc, !isDesktop && { textAlign: 'center' }]}>{s.desc}</Text>
               </View>
             ))}
           </View>
@@ -1716,7 +1716,7 @@ const styles = StyleSheet.create({
   howSectionDesktop: { paddingHorizontal: 80 },
   howSteps: { width: '100%', gap: 32, marginTop: 16 },
   howStepsDesktop: { flexDirection: 'row', justifyContent: 'center', gap: 40 },
-  howStep: { maxWidth: 340 },
+  howStep: { maxWidth: 340, alignSelf: 'center', width: '100%', alignItems: 'center' },
   howStepDesktop: { alignItems: 'flex-start', flex: 1, maxWidth: 300 },
   howStepNumber: { color: C.copper, fontSize: 40, fontWeight: '700', opacity: 0.5, marginBottom: 8 },
   howStepLine: { width: 40, height: 2, backgroundColor: C.copper, opacity: 0.4, marginBottom: 16 },
