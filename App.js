@@ -23,6 +23,12 @@ if (Platform.OS === 'web') {
   link.href =
     'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,600&family=Great+Vibes&display=swap';
   document.head.appendChild(link);
+
+  // iOS home screen bookmark icon
+  const touchIcon = document.createElement('link');
+  touchIcon.rel = 'apple-touch-icon';
+  touchIcon.href = Image.resolveAssetSource(require('./assets/Intricate_I.png')).uri;
+  document.head.appendChild(touchIcon);
 }
 
 const C = {
