@@ -1014,7 +1014,7 @@ export default function App() {
                   'Communication has broken down or turned into conflict',
                   'Intimacy and desire have faded',
                   'You want to rebuild trust after betrayal',
-                  'You're ready to stop surviving and start thriving',
+                  "You're ready to stop surviving and start thriving",
                 ].map(item => (
                   <View key={item} style={styles.pageModBullet}>
                     <Ionicons name="checkmark-circle" size={18} color={C.copper} />
