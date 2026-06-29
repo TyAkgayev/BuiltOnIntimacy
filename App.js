@@ -575,42 +575,58 @@ export default function App() {
         <View style={[styles.benefitsSection, isDesktop && styles.benefitsSectionDesktop]}>
           <Text style={styles.sectionLabel}>Why Us</Text>
           <Text style={[styles.sectionHeading, serifWeb]}>Our Benefits</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            snapToInterval={benefitSnapInterval}
-            snapToAlignment="center"
-            decelerationRate="fast"
-            contentContainerStyle={[styles.benefitsScroll, { paddingHorizontal: benefitPadding }]}
-            style={[styles.benefitsScrollView, isWeb && { scrollSnapType: 'x mandatory' }]}
-            onScroll={onBenefitScroll}
-            scrollEventThrottle={16}
-          >
-            {BENEFITS.map((b, i) => (
-              <View
-                key={b.title}
-                style={[
-                  styles.benefitCard,
-                  { width: benefitCardW, opacity: i === activeBenefitIdx ? 1 : 0.35 },
-                  isWeb && { scrollSnapAlign: 'center', transition: 'opacity 0.25s' },
-                ]}
-              >
-                <View style={styles.benefitIconWrap}>
-                  <Ionicons name={b.icon} size={28} color={C.copper} />
+          {isDesktop ? (
+            <View style={styles.benefitsGrid}>
+              {BENEFITS.map((b) => (
+                <View key={b.title} style={[styles.benefitCard, styles.benefitCardDesktop]}>
+                  <View style={styles.benefitIconWrap}>
+                    <Ionicons name={b.icon} size={28} color={C.copper} />
+                  </View>
+                  <Text style={[styles.benefitTitle, geoWeb]}>{b.title}</Text>
+                  <Text style={styles.benefitDesc}>{b.desc}</Text>
                 </View>
-                <Text style={[styles.benefitTitle, geoWeb]}>{b.title}</Text>
-                <Text style={styles.benefitDesc}>{b.desc}</Text>
+              ))}
+            </View>
+          ) : (
+            <>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                snapToInterval={benefitSnapInterval}
+                snapToAlignment="center"
+                decelerationRate="fast"
+                contentContainerStyle={[styles.benefitsScroll, { paddingHorizontal: benefitPadding }]}
+                style={[styles.benefitsScrollView, isWeb && { scrollSnapType: 'x mandatory' }]}
+                onScroll={onBenefitScroll}
+                scrollEventThrottle={16}
+              >
+                {BENEFITS.map((b, i) => (
+                  <View
+                    key={b.title}
+                    style={[
+                      styles.benefitCard,
+                      { width: benefitCardW, opacity: i === activeBenefitIdx ? 1 : 0.35 },
+                      isWeb && { scrollSnapAlign: 'center', transition: 'opacity 0.25s' },
+                    ]}
+                  >
+                    <View style={styles.benefitIconWrap}>
+                      <Ionicons name={b.icon} size={28} color={C.copper} />
+                    </View>
+                    <Text style={[styles.benefitTitle, geoWeb]}>{b.title}</Text>
+                    <Text style={styles.benefitDesc}>{b.desc}</Text>
+                  </View>
+                ))}
+              </ScrollView>
+              <View style={styles.benefitDots}>
+                {BENEFITS.map((_, i) => (
+                  <View
+                    key={i}
+                    style={[styles.benefitDot, i === activeBenefitIdx && styles.benefitDotActive]}
+                  />
+                ))}
               </View>
-            ))}
-          </ScrollView>
-          <View style={styles.benefitDots}>
-            {BENEFITS.map((_, i) => (
-              <View
-                key={i}
-                style={[styles.benefitDot, i === activeBenefitIdx && styles.benefitDotActive]}
-              />
-            ))}
-          </View>
+            </>
+          )}
           <TouchableOpacity style={[styles.connectBtn, { marginTop: 32, alignSelf: 'center' }]} activeOpacity={0.85} onPress={openForm}>
             <Text style={styles.connectBtnText}>Get Started</Text>
           </TouchableOpacity>
@@ -1223,13 +1239,13 @@ const styles = StyleSheet.create({
   heroBgMobile: { height: 760 },
   heroColMobile: { flex: 1, minHeight: 620 },
   heroLandscapeRow: { flexDirection: 'row', minHeight: 0, flex: 1 },
-  heroCoupleWrapMobile: { height: 420, overflow: 'hidden' },
-  coupleImgMobile: { width: '100%', height: 420 },
+  heroCoupleWrapMobile: { height: 500, overflow: 'hidden' },
+  coupleImgMobile: { width: '100%', height: 500 },
   heroCoupleWrapLandscape: { flex: 1, overflow: 'hidden' },
   coupleImgLandscape: { width: '100%', height: '100%' },
   heroCoupleGradient: {
-    position: 'absolute', left: 0, right: 0, bottom: 0, height: 140,
-    backgroundImage: 'linear-gradient(to bottom, transparent 0%, rgba(10,10,10,0.82) 60%, rgba(10,10,10,1) 100%)',
+    position: 'absolute', left: 0, right: 0, bottom: 0, height: 240,
+    backgroundImage: 'linear-gradient(to bottom, transparent 0%, rgba(10,10,10,0.8) 55%, rgba(10,10,10,1) 82%)',
   },
   heroCoupleGradientLeft: {
     position: 'absolute', top: 0, left: 0, bottom: 0, width: 80,
@@ -1248,7 +1264,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
     paddingTop: 4,
     paddingBottom: 52,
-    marginTop: -80,
+    marginTop: -160,
   },
   heroRowDesktop: { flexDirection: 'row', alignItems: 'flex-end', minHeight: 600 },
   heroOverlay: { paddingHorizontal: 28, paddingVertical: 60, justifyContent: 'center' },
@@ -1493,6 +1509,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   benefitsSectionDesktop: { paddingVertical: 72 },
+  benefitsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 20,
+    paddingHorizontal: 60,
+    justifyContent: 'center',
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  benefitCardDesktop: { width: 340, opacity: 1 },
   benefitsScrollView: { alignSelf: 'stretch', overflow: 'hidden' },
   benefitsScroll: {
     gap: 16,
