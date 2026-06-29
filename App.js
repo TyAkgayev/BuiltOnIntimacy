@@ -828,7 +828,7 @@ export default function App() {
               </TouchableOpacity>
             ))}
           </View>
-          <Text style={styles.footerCopy}>© 2025 BuiltOnIntimacy.com · All rights reserved</Text>
+          <Text style={styles.footerCopy}>© 2026 BuiltOnIntimacy.com · All rights reserved</Text>
         </View>
       </Animated.ScrollView>
       </View>
