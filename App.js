@@ -612,7 +612,7 @@ export default function App() {
                     style={[
                       styles.benefitCard,
                       { width: benefitCardW, opacity: i === activeBenefitIdx ? 1 : 0.35 },
-                      isWeb && { scrollSnapAlign: 'center', transition: 'opacity 0.25s' },
+                      isWeb && { scrollSnapAlign: 'center', transition: 'opacity 0.25s', userSelect: 'none' },
                     ]}
                   >
                     <View style={styles.benefitIconWrap}>
@@ -1525,7 +1525,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   benefitCardDesktop: { width: 340, opacity: 1 },
-  benefitsScrollView: { alignSelf: 'stretch', overflow: 'hidden' },
+  benefitsScrollView: { alignSelf: 'stretch' },
   benefitsScroll: {
     gap: 16,
     paddingBottom: 8,
